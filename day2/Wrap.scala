@@ -14,7 +14,7 @@ class Dim extends JavaTokenParsers {
     w <- num
     _ <- sep
     h <- num
-  } yield List(l,w,h) map (Integer.parseInt(_))
+  } yield List(l,w,h) map (Integer.parseInt)
 
   def dim = rep(dim1)
 }
