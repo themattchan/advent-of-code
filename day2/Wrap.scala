@@ -35,11 +35,25 @@ object Wrap extends Dim {
 
   def wrapping(x: List[Int]) = surface(x) + slack(x)
 
+  def volume(x: List[Int]) = x.reduce(_*_)
+
+  def peri(x: List[Int]) = x.sorted.init match {
+    case a::b::_ => (a+b)*2
+    case _ => throw new Exception
+  }
+
+  def ribbon(x: List[Int]) = volume(x) + peri(x)
+
   def main(args: Array[String]) = {
     val input = new FileReader("input.txt")
     val dims = parseAll(dim, input).getOrElse(List())
-    val total = dims.map(wrapping).reduce (_+_)
-    println(total)
+
+    val totWrap = dims.map(wrapping).reduce (_+_)
+    println(totWrap)
+
+    val totRibbon = dims.map(ribbon).reduce (_+_)
+    println(totRibbon)
+
     input.close
   }
 }
