@@ -1,0 +1,44 @@
+import java.io.FileReader
+import scala.util.parsing.combinator._
+
+class Dim extends JavaTokenParsers {
+  override def skipWhitespace = true
+
+  def num = wholeNumber
+  def sep = literal("x")
+
+  def dim1 = for {
+    l <- num
+    _ <- sep
+    w <- num
+    _ <- sep
+    h <- num
+  } yield List(l,w,h) map (Integer.parseInt(_))
+
+  def dim = rep(dim1)
+}
+
+object Wrap extends Dim {
+
+  def surface(x: List[Int]) = {
+    val y = x ++ x
+    val b = y.zip(y.tail).take(x.length)
+    val c = b map { case (x,y) => x*y } reduce (_+_)
+    c*2
+  }
+
+  def slack(x: List[Int]) = x.sorted.init match {
+    case a::b::_ => a*b
+    case _ => throw new Exception
+  }
+
+  def wrapping(x: List[Int]) = surface(x) + slack(x)
+
+  def main(args: Array[String]) = {
+    val input = new FileReader("input.txt")
+    val dims = parseAll(dim, input).getOrElse(List())
+    val foo = dims.map(wrapping).reduce (_+_)
+    println(foo)
+    input.close
+  }
+}
