@@ -2,6 +2,7 @@ import java.io.FileReader
 import scala.util.parsing.combinator._
 
 class Dim extends JavaTokenParsers {
+
   override def skipWhitespace = true
 
   def num = wholeNumber
@@ -37,8 +38,8 @@ object Wrap extends Dim {
   def main(args: Array[String]) = {
     val input = new FileReader("input.txt")
     val dims = parseAll(dim, input).getOrElse(List())
-    val foo = dims.map(wrapping).reduce (_+_)
-    println(foo)
+    val total = dims.map(wrapping).reduce (_+_)
+    println(total)
     input.close
   }
 }
