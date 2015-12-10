@@ -5,7 +5,7 @@ class Dim extends JavaTokenParsers {
 
   override def skipWhitespace = true
 
-  def num = wholeNumber map (Integer.parseInt)
+  def num = wholeNumber map Integer.parseInt
   def sep = literal("x")
 
   def dim1 = for {
@@ -48,10 +48,10 @@ object Wrap extends Dim {
     val input = new FileReader("input.txt")
     val dims = parseAll(dim, input).getOrElse(List())
 
-    val totWrap = dims.map(wrapping).reduce (_+_)
+    val totWrap = dims.map(wrapping).reduce(_+_)
     println(totWrap)
 
-    val totRibbon = dims.map(ribbon).reduce (_+_)
+    val totRibbon = dims.map(ribbon).reduce(_+_)
     println(totRibbon)
 
     input.close
