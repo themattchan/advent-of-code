@@ -1,5 +1,8 @@
 import Data.List
 
+-- NOTE: pay attention to foldl and foldr...
+-- why is move foldl and alternate foldr?
+
 -- list of coordinates visited
 move :: String -> [(Int,Int)]
 move = foldl f [(0,0)]
