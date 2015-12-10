@@ -12,13 +12,14 @@ object LightGrid {
   object ParseInstrs extends JavaTokenParsers {
 
     override def skipWhitespace = true
+
+    def num = wholeNumber map Integer.parseInt
+
     def ON      : Parser[String] = "turn on"
     def OFF     : Parser[String] = "turn off"
     def TOGGLE  : Parser[String] = "toggle"
     def THROUGH : Parser[String] = "through"
     def COMMA   : Parser[String] = ","
-
-    def num = wholeNumber map Integer.parseInt
 
     def parseCoord: Parser[Coord] =
       for {
@@ -29,10 +30,10 @@ object LightGrid {
 
     def parseCoordFromTo: Parser[(Coord,Coord)] =
       for {
-        from <- parseCoord
+        f <- parseCoord
         _ <- THROUGH
-        to <- parseCoord
-      } yield (from,to)
+        t <- parseCoord
+      } yield (f,t)
 
     def parseOn : Parser[Instr] = ON     ~> parseCoordFromTo ^^ { case (f,t) => On(f,t) }
     def parseOff: Parser[Instr] = OFF    ~> parseCoordFromTo ^^ { case (f,t) => Off(f,t) }
