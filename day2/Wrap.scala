@@ -5,7 +5,7 @@ class Dim extends JavaTokenParsers {
 
   override def skipWhitespace = true
 
-  def num = wholeNumber
+  def num = wholeNumber map (Integer.parseInt)
   def sep = literal("x")
 
   def dim1 = for {
@@ -14,7 +14,7 @@ class Dim extends JavaTokenParsers {
     w <- num
     _ <- sep
     h <- num
-  } yield List(l,w,h) map (Integer.parseInt)
+  } yield List(l,w,h)
 
   def dim = rep(dim1)
 }
