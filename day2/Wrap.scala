@@ -28,7 +28,7 @@ object Wrap extends Dim {
     c*2
   }
 
-  def slack(x: List[Int]) = x.sorted.init match {
+  def slack(x: List[Int]) = x.sorted match {
     case a::b::_ => a*b
     case _ => throw new Exception
   }
@@ -37,7 +37,7 @@ object Wrap extends Dim {
 
   def volume(x: List[Int]) = x.reduce(_*_)
 
-  def peri(x: List[Int]) = x.sorted.init match {
+  def peri(x: List[Int]) = x.sorted match {
     case a::b::_ => (a+b)*2
     case _ => throw new Exception
   }
