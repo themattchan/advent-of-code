@@ -41,6 +41,8 @@ object LightGrid {
     def parseInstrs = (parseOn | parseOff | parseTog)*
   }
 
+  // How do you do the actual problem... bit array? clever maths?
+
   def main(args: Array[String]) = {
     val input = new FileReader("input.txt")
     val ins = ParseInstrs
