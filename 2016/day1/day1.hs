@@ -39,7 +39,7 @@ take1 = Parser $ maybeToList . uncons
 
 satisfy = flip mfilter take1
 
-oneof ts = satisfy (`elem` ts)
+oneof = satisfy . flip elem
 
 char = satisfy . (==)
 
