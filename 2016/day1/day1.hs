@@ -37,7 +37,7 @@ instance Alternative Parser where
 
 take1 = Parser $ maybeToList . uncons
 
-satisfy p = take1 >>= mfilter p . pure
+satisfy = flip mfilter take1
 
 oneof ts = satisfy (`elem` ts)
 
