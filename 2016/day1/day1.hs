@@ -13,7 +13,7 @@ owl = (.).(.)
 -- A parser for things is a function from strings to a list of pairs of things and strings
 newtype Parser a = Parser { parse :: String -> [(a,String)] }
 
-runParser = (fmap fst . mfilter (null.snd) . listToMaybe) `owl` parse
+runParser = (fmap fst {-. mfilter (null.snd) -} . listToMaybe) `owl` parse
 
 instance Functor Parser where
   fmap f p = Parser $ map (first f) . parse p
@@ -23,7 +23,7 @@ instance Applicative Parser where
   pf <*> pa = Parser $ \s -> [ (f a, s'') | (f,s') <- parse pf s, (a,s'') <- parse pa s']
 
 instance Monad Parser where
-  p >>= f = Parser $ \s -> concat [ parse (f a) s' | (a,s') <- parse p s]
+  p >>= f = Parser $ \s -> concat [ parse (f a) s' | (a,s') <- parse p s ]
 
 instance MonadPlus Parser where
   mzero = Parser $ const []
@@ -37,7 +37,7 @@ instance Alternative Parser where
 
 take1 = Parser $ maybeToList . uncons
 
-satisfy = flip mfilter take1
+satisfy p = take1 >>= mfilter p . pure
 
 oneof ts = satisfy (`elem` ts)
 
@@ -56,7 +56,7 @@ data Turn = L | R deriving Show
 data Mov = Mov Turn Int deriving Show
 
 parseInput :: Parser [Mov]
-parseInput = pmov `sepBy` (char ',' >> spaces)
+parseInput = pmov `sepBy` (spaces >> char ',' >> spaces)
   where pmov = Mov
             <$> ((char 'L' *> pure L) <|> (char 'R' *> pure R))
             <*> num
@@ -80,6 +80,6 @@ main = do
   x <- runParser parseInput <$> readFile "input.txt"
   case x of
     Nothing -> error "parse failure"
-    Just movs -> print movs
-      -- let finState = foldl' move1 initialState movs
-      -- in print finState
+    Just movs ->
+      let finState = foldl' move1 initialState movs
+      in print movs -- >>  print finState
