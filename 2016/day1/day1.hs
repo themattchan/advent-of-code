@@ -10,10 +10,10 @@ owl = (.).(.)
 
 --------------------------------------------------------------------------------
 
--- A parser for things is a function from strings to a list of pairs of things and strings
+-- "A parser for things is a function from strings to a list of pairs of things and strings"
 newtype Parser a = Parser { parse :: String -> [(a,String)] }
 
-runParser = (fmap fst . listToMaybe) `owl` parse
+runParser = (fmap fst . mfilter (null.snd) . listToMaybe) `owl` parse
 
 instance Functor Parser where
   fmap f p = Parser $ map (first f) . parse p
@@ -32,7 +32,7 @@ instance MonadPlus Parser where
 instance Alternative Parser where
   empty = mzero
   p <|> q = Parser $ \s ->
-    let  f = parse p s in
+    let f = parse p s in
       if null f then parse q s else f
 
 take1 = Parser $ maybeToList . uncons
@@ -55,7 +55,7 @@ data Turn = L | R deriving Show
 data Mov = Mov Turn Int deriving Show
 
 parseInput :: Parser [Mov]
-parseInput = pmov `sepBy` (char ',' >> spaces)
+parseInput = (pmov `sepBy` (char ',' >> spaces)) <* spaces
   where pmov = Mov
             <$> ((char 'L' *> pure L) <|> (char 'R' *> pure R))
             <*> num
