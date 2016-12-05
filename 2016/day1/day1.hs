@@ -13,7 +13,7 @@ owl = (.).(.)
 -- A parser for things is a function from strings to a list of pairs of things and strings
 newtype Parser a = Parser { parse :: String -> [(a,String)] }
 
-runParser = (fmap fst {-. mfilter (null.snd) -} . listToMaybe) `owl` parse
+runParser = (fmap fst . listToMaybe) `owl` parse
 
 instance Functor Parser where
   fmap f p = Parser $ map (first f) . parse p
