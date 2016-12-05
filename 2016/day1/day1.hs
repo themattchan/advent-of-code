@@ -51,7 +51,6 @@ spaces = many (oneof "\t\n ")
 
 --------------------------------------------------------------------------------
 
-
 data Turn = L | R deriving Show
 data Mov = Mov Turn Int deriving Show
 
@@ -64,22 +63,37 @@ parseInput = pmov `sepBy` (char ',' >> spaces)
 --------------------------------------------------------------------------------
 
 data Dir = N | E | S | W
-  deriving (Eq, Show)
+  deriving (Eq, Show, Enum, Bounded)
 
--- No. of blocks: N E S W
+next :: Dir -> Dir
+next e | e == maxBound = minBound
+       | otherwise = succ e
+
+prev :: Dir -> Dir
+prev e | e == minBound = maxBound
+       | otherwise = pred e
+
 data State = State Dir Int Int Int Int
   deriving Show
 
 initialState = State N 0 0 0 0
 
+move (State N n e s w) i = (State N (n+i) e s w)
+move (State E n e s w) i = (State E n (e+i) s w)
+move (State S n e s w) i = (State S n e (s+i) w)
+move (State W n e s w) i = (State W n e s (w+i))
+
+turn (State dir n e s w) L = (State (prev dir) n e s w)
+turn (State dir n e s w) R = (State (next dir) n e s w)
+
+distanceMoved (State _ n e s w) = abs (n + e - s - w)
+
 move1 :: State -> Mov -> State
-move1 (State d n e s w) (Mov turn  step) = undefined
+move1 st (Mov tu n) = move (turn st tu) n
 
 main :: IO ()
 main = do
   x <- runParser parseInput <$> readFile "input.txt"
   case x of
     Nothing -> error "parse failure"
-    Just movs ->
-      let finState = foldl' move1 initialState movs
-      in print movs -- >>  print finState
+    Just movs -> print $ distanceMoved (foldl' move1 initialState movs)
