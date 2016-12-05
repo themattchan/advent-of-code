@@ -8,7 +8,7 @@ import Data.List
 
 --------------------------------------------------------------------------------
 
--- A parser for things is a function from strings to a list of things and strings
+-- A parser for things is a function from strings to a list of pairs of things and strings
 newtype Parser a = Parser { parse :: String -> [(a,String)] }
 
 runParser p s = case parse p s of
