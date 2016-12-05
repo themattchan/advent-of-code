@@ -56,7 +56,7 @@ data Turn = L | R deriving Show
 data Mov = Mov Turn Int deriving Show
 
 parseInput :: Parser [Mov]
-parseInput = pmov `sepBy` (spaces >> char ',' >> spaces)
+parseInput = pmov `sepBy` (char ',' >> spaces)
   where pmov = Mov
             <$> ((char 'L' *> pure L) <|> (char 'R' *> pure R))
             <*> num
