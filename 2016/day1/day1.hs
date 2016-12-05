@@ -78,22 +78,22 @@ data State = State Dir Int Int Int Int
 
 initialState = State N 0 0 0 0
 
-move (State N n e s w) i = (State N (n+i) e s w)
-move (State E n e s w) i = (State E n (e+i) s w)
-move (State S n e s w) i = (State S n e (s+i) w)
-move (State W n e s w) i = (State W n e s (w+i))
+step (State N n e s w) i = (State N (n+i) e s w)
+step (State E n e s w) i = (State E n (e+i) s w)
+step (State S n e s w) i = (State S n e (s+i) w)
+step (State W n e s w) i = (State W n e s (w+i))
 
 turn (State dir n e s w) L = (State (prev dir) n e s w)
 turn (State dir n e s w) R = (State (next dir) n e s w)
 
 distanceMoved (State _ n e s w) = abs (n + e - s - w)
 
-move1 :: State -> Mov -> State
-move1 st (Mov tu n) = move (turn st tu) n
+move :: State -> Mov -> State
+move st (Mov tu n) = step (turn st tu) n
 
 main :: IO ()
 main = do
   x <- runParser parseInput <$> readFile "input.txt"
   case x of
     Nothing -> error "parse failure"
-    Just movs -> print $ distanceMoved (foldl' move1 initialState movs)
+    Just movs -> print $ distanceMoved (foldl' move initialState movs)
