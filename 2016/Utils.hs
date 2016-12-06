@@ -60,3 +60,8 @@ num :: Parser Int
 num = read <$> some (satisfy isDigit)
 
 spaces = many (oneof "\t\n ")
+
+literal :: String -> Parser String
+literal = mapM char
+
+eat = flip replicateM_ take1
