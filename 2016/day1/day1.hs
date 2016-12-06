@@ -9,7 +9,7 @@ data Mov = Mov Turn Int deriving Show
 parseInput :: Parser [Mov]
 parseInput = (pmov `sepBy` (char ',' >> spaces)) <* spaces
   where pmov = Mov
-            <$> ((char 'L' *> pure L) <|> (char 'R' *> pure R))
+            <$> (literal "L" L <|> literal "R" R)
             <*> num
 
 --------------------------------------------------------------------------------
