@@ -67,3 +67,5 @@ string = mapM char
 literal s x = string s >> pure x
 
 eat = flip replicateM_ take1
+
+between p q x = p *> x <* q
