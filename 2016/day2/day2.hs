@@ -9,7 +9,7 @@ move k _ = k
 -- 1985
 test = "ULL\nRRDDD\nLURDL\nUUUUD"
 
-main = go <$> file >>= print
+main = go <$> file >>= putStrLn . foldMap show
   where
     file = readFile "input.txt"
     go = tail . scanl (foldl move) 5 . lines
