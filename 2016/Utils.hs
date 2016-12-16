@@ -1,21 +1,25 @@
 module Utils
   ( module Utils
   , module Control.Applicative
+  , module Control.Arrow
   , module Control.Monad
   , module Data.Bifunctor
   , module Data.Char
   , module Data.Maybe
   , module Data.Monoid
   , module Data.List
+  , module Data.Ord
   ) where
 
 import Control.Applicative
+import Control.Arrow ((&&&), (>>>), (<<<))
 import Control.Monad
 import Data.Bifunctor
 import Data.Char
 import Data.Maybe
 import Data.Monoid
 import Data.List
+import Data.Ord (comparing)
 
 (...) = (.).(.)
 
@@ -25,6 +29,8 @@ import Data.List
 newtype Parser a = Parser { parse :: String -> [(a,String)] }
 
 runParser = (fmap fst . mfilter (null.snd) . listToMaybe) ... parse
+
+runParserPartial = (fmap fst . listToMaybe) ... parse
 
 instance Functor Parser where
   fmap f p = Parser $ map (first f) . parse p
@@ -60,6 +66,9 @@ num :: Parser Int
 num = read <$> some (satisfy isDigit)
 
 spaces = many (oneof "\t\n ")
+
+alpha :: Parser String
+alpha = many (oneof ['a'..'z'])
 
 string :: String -> Parser String
 string = mapM char

@@ -29,11 +29,18 @@ isReal Entry{..}
         c | c1 == EQ  = comparing fst x y
           | otherwise = c1
 
-main
-  = runParser parseInp
-  <$> readFile "input.txt"
-  >>= print
-  . fmap ( sum
-         . map sid
-         . filter isReal
-         )
+decode Entry{..}
+  = map shift encName
+  where
+    shift
+      = chr
+      . (+ 97)
+      . (`mod` 26)
+      . (subtract 97)
+      . (+ sid)
+      . ord
+
+main = do
+  i <- runParser parseInp <$> readFile "input.txt"
+  print $ sum . map sid . filter isReal <$> i
+  print $ map sid . filter (isInfixOf "northpole" . decode) <$> i
