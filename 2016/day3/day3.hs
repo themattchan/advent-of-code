@@ -1,23 +1,15 @@
+import Control.Applicative
+import Data.Profunctor
 import Data.List
 import Data.List.Split
 
 isTri [x,y,z] = x + y > z
 
-part1
-  = length
-  . filter isTri
-  . map ( sort
-        . map read
-        . words
-        )
+process = dimap (map (map read . words))
+                (length . filter isTri . map sort)
 
-part2
-  = length
-  . filter isTri
-  . map sort
-  . concatMap (chunksOf 3)
-  . transpose
-  . map (map read . words)
+part1 = process id
+part2 = process (concatMap (chunksOf 3) . transpose)
 
 main = do
   i <- lines <$> readFile "input.txt"
