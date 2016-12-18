@@ -28,7 +28,7 @@ sixthHex :: Word32 -> Word32
 sixthHex x = (x `shift` (-16)) .&. 0xf
 
 seventhHex :: Word32 -> Word32
-seventhHex x = (x `rotateL` 4) .&. 0xf
+seventhHex x = (x `shift` (-28)) .&. 0xf
 
 -- foo
 --   = map (printHex . sixthHex . swap32)
@@ -47,13 +47,16 @@ password1 doorId
   $ [0..]
 
 
-validPosition x = sixthHex x <= 7
+validPosition x = sixthHex x >= 0 && sixthHex x <= 7
 
-password2 :: String -> String
+-- FIXME: no duplicates!!!!
+-- password2 "abc"
+-- [(1,5),(4,14),(7,3),(3,12),(0,0),(6,14),(7,11),(6,6)]
+--password2 :: String -> String
 password2 doorId
-  = foldMap (printHex . snd)
-  . sortBy (comparing fst)
-  . map (sixthHex &&& seventhHex)
+  -- = foldMap (printHex . snd)
+  -- . sortBy (comparing fst)
+  = map (sixthHex &&& seventhHex)
   . take 8
   . filter (\x -> zeroPrefix x && validPosition x)
   . map (abcdA . md5 . Str . (doorId <>) . show)
