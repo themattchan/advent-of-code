@@ -1,3 +1,7 @@
+import Control.Arrow ((&&&))
+import Data.List
+import Data.Ord
+
 import Data.Hash.MD5
 import Data.Word
 import Data.Monoid
@@ -23,6 +27,9 @@ zeroPrefix x = (x .&. 0x00f0ffff) == 0
 sixthHex :: Word32 -> Word32
 sixthHex x = (x `shift` (-16)) .&. 0xf
 
+seventhHex :: Word32 -> Word32
+seventhHex x = (x `rotateL` 4) .&. 0xf
+
 -- foo
 --   = map (printHex . sixthHex . swap32)
 --   . map (abcdA . md5)
@@ -31,10 +38,23 @@ sixthHex x = (x `shift` (-16)) .&. 0xf
 doorId :: String
 doorId = "cxdnnyjw"
 
-password :: String -> String
-password doorId
+password1 :: String -> String
+password1 doorId
   = foldMap (printHex . sixthHex)
   . take 8
   . filter zeroPrefix
+  . map (abcdA . md5 . Str . (doorId <>) . show)
+  $ [0..]
+
+
+validPosition x = sixthHex x <= 7
+
+password2 :: String -> String
+password2 doorId
+  = foldMap (printHex . snd)
+  . sortBy (comparing fst)
+  . map (sixthHex &&& seventhHex)
+  . take 8
+  . filter (\x -> zeroPrefix x && validPosition x)
   . map (abcdA . md5 . Str . (doorId <>) . show)
   $ [0..]
