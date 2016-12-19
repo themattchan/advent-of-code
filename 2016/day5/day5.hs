@@ -19,7 +19,7 @@ sixthHex :: Word32 -> Word32
 sixthHex x = (x `shift` (-16)) .&. 0xf
 
 seventhHex :: Word32 -> Word32
-seventhHex x = (x `shift` (-28)) .&. 0xf
+seventhHex x = (x `shiftL` 4) .&. 0xf
 
 doorId :: String
 doorId = "cxdnnyjw"
