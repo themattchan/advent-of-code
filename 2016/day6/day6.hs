@@ -1,12 +1,12 @@
+import Control.Arrow
+import Data.Bifunctor
 import Data.List
 import Data.Ord
 
-solve f = map (head . f (comparing length) . group . sort) . transpose
-
-part1 = solve maximumBy
-part2 = solve minimumBy
+solve = bimap h h . unzip . map (f (comparing length) . group . sort) . transpose
+  where
+    f = uncurry (&&&) . (maximumBy &&& minimumBy)
+    h = map head
 
 main = do
-  i <- lines <$> readFile "input.txt"
-  print $ part1 i
-  print $ part2 i
+  lines <$> readFile "input.txt" >>= print . solve
