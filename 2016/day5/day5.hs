@@ -3,7 +3,6 @@ import Data.Function (on)
 import Data.List
 import Data.Ord (comparing)
 import qualified Data.Map as M
-import qualified Data.Set as S
 import Data.Hash.MD5
 import Data.Word
 import Data.Monoid
@@ -38,16 +37,16 @@ password1 doorId
 
 password2 :: String -> String
 password2 doorId
-  = foldMap printHex . mconcat $ unfoldr go (0, S.fromList [0..7])
+  = foldMap printHex . mconcat $ unfoldr go (0, [0..7])
   where
     go (i,r)
-      | S.null r = Nothing
+      | null r    = Nothing
       | otherwise = Just (h, (i+1, r'))
       where
         hash   = (abcdA . md5 . Str . (doorId <>)) (show i)
         x      = sixthHex hash
         y      = seventhHex hash
-        (h,r') | zeroPrefix hash && x `S.member` r
-               = (M.singleton x y, x `S.delete` r)
+        (h,r') | zeroPrefix hash && x `elem` r
+               = (M.singleton x y, x `delete` r)
                | otherwise
                = (M.empty, r)
