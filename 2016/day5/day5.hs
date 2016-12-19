@@ -1,7 +1,4 @@
-import Control.Arrow ((&&&))
-import Data.Function (on)
 import Data.List
-import Data.Ord (comparing)
 import qualified Data.Map as M
 import Data.Hash.MD5
 import Data.Word
