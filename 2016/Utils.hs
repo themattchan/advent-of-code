@@ -14,14 +14,21 @@ module Utils
 import Control.Applicative
 import Control.Arrow ((&&&), (>>>), (<<<))
 import Control.Monad
+import Data.Bits
 import Data.Bifunctor
 import Data.Char
 import Data.Maybe
 import Data.Monoid
 import Data.List
 import Data.Ord (comparing)
+import Text.Printf
+import qualified Numeric
 
 (...) = (.).(.)
+
+showBin, showHex :: (Integral a, PrintfArg a, FiniteBits a) => a -> String
+showHex x = printf "%0*Lx" (finiteBitSize x) x
+showBin x = printf "%0*Lb" (finiteBitSize x) x
 
 --------------------------------------------------------------------------------
 
