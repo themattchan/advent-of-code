@@ -59,7 +59,7 @@ rotateRow1 b n = b' where
     topMask = mask (50 - n)
     botMask = ((mask (n+1)) `clearBit` 63) `shiftR` (50 - n -1)
     b' =  ((((b .&. topMask) `shiftR` 1) `clearBit` 63) `shiftR` (n-1))
-      .|. ((b .&. botMask) `shiftL` (50 - n))
+      .|.   ((b .&. botMask) `shiftL` (50 - n))
 
 rotateCol (Grid g) i n = Grid g'
   where
