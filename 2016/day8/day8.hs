@@ -11,29 +11,26 @@ data Sel = Row | Col
 
 parseInput = sepBy (parseRect <|> parseRotate) spaces
   where
-    parseRect = do
-      string "rect"
-      spaces
-      m <- num
-      char 'x'
-      n <- num
-      return (Rect m n)
+    parseRect = Rect
+             <$> (string "rect" *> spaces *> num)
+             <*> (char 'x' *> num)
 
-    parseRotate = do
-      string "rotate"
-      spaces
-      sel <- (literal "row" Row) <|> (literal "column" Col)
-      spaces; eat 2
-      i <- num
-      spaces; string "by"; spaces
-      n <- num
-      return (Rotate sel i n)
+    parseRotate = Rotate
+               <$> (string "rotate" *> spaces *>
+                     ((literal "row"    Row) <|>
+                      (literal "column" Col)))
+               <*> (spaces *> eat 2 *> num)
+               <*> (spaces *> string "by" *> spaces *> num)
 
 -- 50 cols x 6 rows
 newtype Grid = Grid [Int64]
 
 instance Show Grid where
-  show (Grid g) = unlines $ map showBin g
+  show (Grid g) = map p $ unlines $ map showBin g
+    where
+      p '0' = '_'
+      p '1' = '#'
+      p  c  =  c
 
 blankGrid :: Grid
 blankGrid = Grid (replicate 6 zeroBits)
@@ -91,5 +88,4 @@ main = do
     Nothing -> undefined
     Just cmds -> do
       print $ countGrid (run cmds)
-      -- blow this up to find: AFBUPZBJPS
       putStrLn (show (run cmds))
