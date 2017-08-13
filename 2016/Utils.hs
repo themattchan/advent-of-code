@@ -45,16 +45,13 @@ instance Functor Parser where
   fmap f p = Parser $ map (first f) . parse p
 
 instance Applicative Parser where
--- pure x = Parser $ \s -> [(x,s)]
   pure = Parser . (pure ... (,))
---  pf <*> pa = Parser $ \s -> [ (f a, s'') | (f,s') <- parse pf s, (a,s'') <- parse pa s']
   pf <*> pa = Parser $ concatMap (uncurry (fmap.first))
                      . map (id *** parse pa) . parse pf
 
 joinParser = Parser . (concatMap (uncurry parse) ... parse)
 instance Monad Parser where
   (>>=) = joinParser ... flip fmap
-  --  p >>= f = Parser $ \s -> concat [ parse (f a) s' | (a,s') <- parse p s ]
 
 instance MonadPlus Parser where
   mzero = Parser $ const []
