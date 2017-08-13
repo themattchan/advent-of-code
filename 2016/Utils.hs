@@ -12,7 +12,7 @@ module Utils
   ) where
 
 import Control.Applicative
-import Control.Arrow ((&&&), (>>>), (<<<))
+import Control.Arrow ((***), (&&&), (>>>), (<<<))
 import Control.Monad
 import Data.Bits
 import Data.Bifunctor
@@ -24,6 +24,8 @@ import Data.Ord (comparing)
 import Text.Printf
 import qualified Numeric
 
+infixl 8 ...
+(...) :: (c -> d) -> (a -> b -> c) -> (a -> b -> d)
 (...) = (.).(.)
 
 showBin, showHex :: (Integral a, PrintfArg a, FiniteBits a) => a -> String
@@ -35,29 +37,32 @@ showBin x = printf "%0*Lb" (finiteBitSize x) x
 -- "A parser for things is a function from strings to a list of pairs of things and strings"
 newtype Parser a = Parser { parse :: String -> [(a,String)] }
 
-runParser = (fmap fst . mfilter (null.snd) . listToMaybe) ... parse
+runParser = fmap fst . mfilter (null.snd) . listToMaybe ... parse
 
-runParserPartial = (fmap fst . listToMaybe) ... parse
+runParserPartial = fmap fst . listToMaybe ... parse
 
 instance Functor Parser where
   fmap f p = Parser $ map (first f) . parse p
 
 instance Applicative Parser where
-  pure x = Parser $ \s -> [(x,s)]
-  pf <*> pa = Parser $ \s -> [ (f a, s'') | (f,s') <- parse pf s, (a,s'') <- parse pa s']
+-- pure x = Parser $ \s -> [(x,s)]
+  pure = Parser . (pure ... (,))
+--  pf <*> pa = Parser $ \s -> [ (f a, s'') | (f,s') <- parse pf s, (a,s'') <- parse pa s']
+  pf <*> pa = Parser $ concatMap (uncurry (fmap.first))
+                     . map (id *** parse pa) . parse pf
 
+joinParser = Parser . (concatMap (uncurry parse) ... parse)
 instance Monad Parser where
-  p >>= f = Parser $ \s -> concat [ parse (f a) s' | (a,s') <- parse p s ]
+  (>>=) = joinParser ... flip fmap
+  --  p >>= f = Parser $ \s -> concat [ parse (f a) s' | (a,s') <- parse p s ]
 
 instance MonadPlus Parser where
   mzero = Parser $ const []
-  p `mplus` q = Parser $ \s -> parse p s <> parse q s
+  p `mplus` q = Parser $ uncurry mappend . (parse p &&& parse q)
 
 instance Alternative Parser where
   empty = mzero
-  p <|> q = Parser $ \s ->
-    let f = parse p s in
-      if null f then parse q s else f
+  p <|> q = Parser $ uncurry (<|>) . (parse p &&& parse q)
 
 take1 = Parser $ maybeToList . uncons
 
