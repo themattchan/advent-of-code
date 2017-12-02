@@ -32,6 +32,9 @@ showBin, showHex :: (Integral a, PrintfArg a, FiniteBits a) => a -> String
 showHex x = printf "%0*Lx" (finiteBitSize x) x
 showBin x = printf "%0*Lb" (finiteBitSize x) x
 
+numbers :: String -> [[Int]]
+numbers = map (map read . words) . lines
+
 --------------------------------------------------------------------------------
 
 -- "A parser for things is a function from strings to a list of pairs of things and strings"
