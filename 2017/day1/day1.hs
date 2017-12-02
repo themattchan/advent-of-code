@@ -3,7 +3,7 @@ import Utils
 
 solve :: Int -> [Int] -> Int
 solve n = getSum
-        . foldMap (Sum . fst)
+        . foldMap (foldMap Sum)
         . filter (uncurry (==))
         . uncurry zip
         . (id &&& drop n . cycle)
