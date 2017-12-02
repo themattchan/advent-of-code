@@ -1,5 +1,4 @@
 #! /usr/bin/env runhaskell -i../../
-{-# LANGUAGE RecordWildCards #-}
 import Utils
 
 solve1 :: [Int] -> Int
@@ -10,7 +9,14 @@ solve1 xs = getSum
           $ zip (cycle xs) (tail (cycle xs))
 
 solve2 :: [Int] -> Int
-solve2 xs = undefined
+solve2 xs = getSum
+          . foldMap (Sum . fst)
+          . filter (uncurry (==))
+          . take len
+          $ zip (cycle xs) (drop n (cycle xs))
+  where
+    len = length xs
+    n = len `div` 2
 
 main :: IO ()
 main = do
