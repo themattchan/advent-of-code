@@ -89,4 +89,4 @@ literal s x = string s *> pure x
 
 eat = flip replicateM_ take1
 
-between p q = ((p *>) .) . (. (<* q))
+between p q = (p *>) . (<* q)
