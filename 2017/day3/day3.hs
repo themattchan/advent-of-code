@@ -60,7 +60,7 @@ window n xs = go (length xs - n + 1) xs
 
 -- (indicies of) neighbours of (indicies of) this ring in previous ring.
 prevNeighbours :: Int -> [(Int, [Int])]
-prevNeighbours n = nub $ tail $ concatMap go ns
+prevNeighbours n = concatMap (tail . go) ns
   where
     go (ps,ts) = map (fmap catMaybes) $ zip ts ws
       where
