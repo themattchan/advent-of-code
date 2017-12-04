@@ -9,6 +9,8 @@ main = do
 input :: Int
 input = 312051
 
+--------------------------------------------------------------------------------
+
 solve1 :: Int -> Int
 solve1 input =
   let
@@ -48,11 +50,10 @@ nthAnchor n = (nthOdd n) ^ 2
 sides :: Int -> [[Int]]
 sides n = take 4 $ unfoldr go indexes
   where
-    go xs = Just (take slen xs, drop (slen-1) xs)
-
-    slen = nthOdd n
-    rs = ringsize n
+    go      = Just . (take slen &&& drop (slen-1))
     indexes = drop (rs-1) $ cycle (take rs [0..])
+    slen    = nthOdd n
+    rs      = ringsize n
 
 window :: Int -> [a] -> [[a]]
 window n xs = go (length xs - n + 1) xs
@@ -70,20 +71,21 @@ sideNeighbours n = nub $ tail $ concatMap go ns
     ns = zip (sides (n-1)) (sides n)
 
 seq2 :: [Integer]
-seq2 = concat $ go 0 [1] where
-  go n prevRing = prevRing : go n' nextRing
-    where
-      n' = n+1
-      nextRing = [   (if i > 0 then nextRing !! (i-1) else 0)
-                   + (if idx `elem` afterCorners then nextRing !! (i-2) else 0)
-                   -- the last two numbers are neighbours with number 0 in this ring
-                   + (if idx == nthAnchor n' || idx == (nthAnchor n') -1 then nextRing !! 0 else 0)
-                   + pns
-                 | (i, idx, pns) <- zip3 [0..] nextIdxs prevNeighbourSums
-                 ]
-      afterCorners = init $ map (+1) (corners n')
-      nextIdxs = [(nthAnchor n) + 1 .. nthAnchor n']
-      prevNeighbourSums = map (sum . (map (prevRing !!)) . snd) $ sideNeighbours n'
+seq2 = concat $ go 0 [1]
+  where
+    go n prevRing = prevRing : go n' nextRing
+      where
+        n' = n+1
+        nextRing = [   (if i > 0 then nextRing !! (i-1) else 0)
+                     + (if idx `elem` afterCorners then nextRing !! (i-2) else 0)
+                     -- the last two numbers are neighbours with number 0 in this ring
+                     + (if idx == nthAnchor n' || idx == (nthAnchor n') -1 then nextRing !! 0 else 0)
+                     + pns
+                   | (i, idx, pns) <- zip3 [0..] nextIdxs prevNeighbourSums
+                   ]
+        afterCorners = init $ map (+1) (corners n')
+        nextIdxs = [nthAnchor n + 1 .. nthAnchor n']
+        prevNeighbourSums = map (sum . (map (prevRing !!)) . snd) $ sideNeighbours n'
 
 solve2 :: Integer -> Integer
 solve2 index = head $ dropWhile (<= index) seq2
