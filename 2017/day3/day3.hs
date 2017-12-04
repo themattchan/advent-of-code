@@ -53,8 +53,7 @@ sides n = take 4 $ unfoldr go indexes
 
 -- indices of corners
 corners :: Int -> [Int]
-corners 0 = [1]
-corners n = map last (sides n)
+corners = map last . sides
 
 window :: Int -> [a] -> [[a]]
 window n xs = go (length xs - n + 1) xs
