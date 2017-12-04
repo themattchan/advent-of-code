@@ -61,8 +61,9 @@ window n xs = go (length xs - n + 1) xs
     go 0 _  = []
     go w ys = take n ys : go (w-1) (tail ys)
 
-sideNeighbours :: Int -> [(Int, [Int])]
-sideNeighbours n = nub $ tail $ concatMap go ns
+-- (indicies of) neighbours of (indicies of) this ring in previous ring.
+prevNeighbours :: Int -> [(Int, [Int])]
+prevNeighbours n = nub $ tail $ concatMap go ns
   where
     go (ps,ts) = map (fmap catMaybes) $ zip ts ws
       where
@@ -77,15 +78,17 @@ seq2 = concat $ go 0 [1]
       where
         n' = n+1
         nextRing = [   (if i > 0 then nextRing !! (i-1) else 0)
+                     -- numbers after a corner are neighbours with the corner
+                     -- (above) and the number before the corner diagonally
                      + (if idx `elem` afterCorners then nextRing !! (i-2) else 0)
                      -- the last two numbers are neighbours with number 0 in this ring
-                     + (if idx == nthAnchor n' || idx == (nthAnchor n') -1 then nextRing !! 0 else 0)
+                     + (if idx >= (nthAnchor n') - 1 then nextRing !! 0 else 0)
                      + pns
                    | (i, idx, pns) <- zip3 [0..] nextIdxs prevNeighbourSums
                    ]
         afterCorners = init $ map (+1) (corners n')
         nextIdxs = [nthAnchor n + 1 .. nthAnchor n']
-        prevNeighbourSums = map (sum . (map (prevRing !!)) . snd) $ sideNeighbours n'
+        prevNeighbourSums = map (sum . map (prevRing !!) . snd) $ prevNeighbours n'
 
 solve2 :: Integer -> Integer
 solve2 input = head $ dropWhile (<= input) seq2
