@@ -16,7 +16,7 @@ prefixFiveZeros :: String -> Bool
 prefixFiveZeros = (== "00000") . take 5
 
 prefixSixZeros :: String -> Bool
-prefixSixZeros = (== "000000") . take 5
+prefixSixZeros = (== "000000") . take 6
 
 chunks n [] = []
 chunks n xs = take n xs : chunks n (drop n xs)
@@ -29,8 +29,8 @@ pmconcat cs = go where
 solve :: (String -> Bool) -> String -> Int
 solve prefixPred input = go [0..]
   where
-    bufsize = 100
-    chunksize = 10
+    bufsize = 10000
+    chunksize = 200
 
     go xs = case a' of
               First Nothing -> go bs
@@ -50,5 +50,5 @@ solve prefixPred input = go [0..]
           $ show i
 
 main = do
---  print $ solve prefixFiveZeros input
+  print $ solve prefixFiveZeros input
   print $ solve prefixSixZeros  input
