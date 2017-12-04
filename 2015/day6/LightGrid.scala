@@ -100,10 +100,10 @@ object LightGrid {
   def main(args: Array[String]) = {
 
     val ins = bracketFile("input.txt")
-                          { inp => ParseInstrs
-                                   .parseAll(ParseInstrs.parseInstrs, inp)
-                                   .getOrElse(List())
-                          }
+                { ParseInstrs
+                    .parseAll(ParseInstrs.parseInstrs, _)
+                    .getOrElse(List())
+                }
 
     // why the fuck doesn't this work
     // ins foreach (solve1 andThen println)
