@@ -50,7 +50,7 @@ sides n = take 4 $ unfoldr go indexes
 
 -- indices of corners
 corners :: Int -> [Int]
-corners = map last . sides
+corners = map head . sides
 
 window :: Int -> [a] -> [[a]]
 window n xs = go (length xs - n + 1) xs
@@ -83,7 +83,7 @@ seq2 = concat $ go 0 [1]
                      + pns
                    | (i, pns) <- prevNeighbourSums
                    ]
-        afterCorners = init $ map (+1) (corners n')
+        afterCorners = tail $ map (+1) (corners n')
         prevNeighbourSums = map (fmap (sum . map (prevRing !!))) $ prevNeighbours n'
 
 solve2 :: Integer -> Integer
