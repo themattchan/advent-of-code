@@ -88,4 +88,4 @@ seq2 = concat $ go 0 [1]
         prevNeighbourSums = map (sum . (map (prevRing !!)) . snd) $ sideNeighbours n'
 
 solve2 :: Integer -> Integer
-solve2 index = head $ dropWhile (<= index) seq2
+solve2 input = head $ dropWhile (<= input) seq2
