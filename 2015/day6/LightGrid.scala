@@ -50,8 +50,8 @@ object LightGrid {
 
   val points =
     for { x <- 0 to 999
-      y <- 0 to 999
-  } yield (x,y)
+          y <- 0 to 999
+        } yield (x,y)
 
   def applyCommands1 (pt : Coord, st0 : Boolean, commands : List[Instr]) : Boolean = {
     commands.foldLeft (st0) { (st, comm) =>
