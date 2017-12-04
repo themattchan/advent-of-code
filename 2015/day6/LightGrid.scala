@@ -81,10 +81,6 @@ object LightGrid {
   def solve2 (commands : List[Instr]) : Int =
     points.foldLeft (0) { (b, pt) => applyCommands2(pt, 0, commands) + b }
 
-
-  // How do you do the actual problem... bit array? clever maths?
-//  def apply(
-
   def bracketFile[A](file : String)(f : FileReader => A) : Option[A] = {
     try {
       val input = new FileReader(file)
