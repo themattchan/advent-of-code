@@ -40,9 +40,6 @@ ringsize n = 8 * n
 nthOdd :: Integral a => a -> a
 nthOdd n = 2*n + 1
 
-nthAnchor :: Integral a => a -> a
-nthAnchor n = (nthOdd n) ^ 2
-
 sides :: Int -> [[Int]]
 sides n = take 4 $ unfoldr go indexes
   where
