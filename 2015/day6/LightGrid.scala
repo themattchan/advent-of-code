@@ -53,33 +53,35 @@ object LightGrid {
           y <- 0 to 999
         } yield (x,y)
 
-  def applyCommands1 (pt : Coord, st0 : Boolean, commands : List[Instr]) : Boolean = {
-    commands.foldLeft (st0) { (st, comm) =>
-      comm match {
-        case On      (tl, br) if inBounds (tl, br) (pt) => true
-        case Off     (tl, br) if inBounds (tl, br) (pt) => false
-        case Toggle  (tl, br) if inBounds (tl, br) (pt) => ! st
-        case _ => st
+  def solve1 (commands : List[Instr]) : Int = {
+    def applyCommands (pt : Coord, st0 : Boolean) = {
+      commands.foldLeft (st0) { (st, comm) =>
+        comm match {
+          case On      (tl, br) if inBounds (tl, br) (pt) => true
+          case Off     (tl, br) if inBounds (tl, br) (pt) => false
+          case Toggle  (tl, br) if inBounds (tl, br) (pt) => ! st
+          case _ => st
+        }
       }
     }
+
+    points.foldLeft (0) { (s,pt) => if (applyCommands (pt, false)) s+1 else s }
   }
 
-  def solve1 (commands : List[Instr]) : Int =
-    points.foldLeft (0) { (s,pt) => if (applyCommands1 (pt, false, commands)) s+1 else s }
-
-  def applyCommands2 (pt : Coord, st0 : Int, commands : List[Instr]) : Int = {
-    commands.foldLeft (st0) { (st, comm) =>
-      comm match {
-        case On      (tl, br) if inBounds (tl, br) (pt) => st + 1
-        case Off     (tl, br) if inBounds (tl, br) (pt) => 0 max (st - 1)
-        case Toggle  (tl, br) if inBounds (tl, br) (pt) => st + 2
-        case _ => st
+  def solve2 (commands : List[Instr]) : Int = {
+    def applyCommands (pt : Coord, st0 : Int) = {
+      commands.foldLeft (st0) { (st, comm) =>
+        comm match {
+          case On      (tl, br) if inBounds (tl, br) (pt) => st + 1
+          case Off     (tl, br) if inBounds (tl, br) (pt) => 0 max (st - 1)
+          case Toggle  (tl, br) if inBounds (tl, br) (pt) => st + 2
+          case _ => st
+        }
       }
     }
-  }
 
-  def solve2 (commands : List[Instr]) : Int =
-    points.foldLeft (0) { (b, pt) => applyCommands2(pt, 0, commands) + b }
+    points.foldLeft (0) { (b, pt) => applyCommands(pt, 0) + b }
+  }
 
   def bracketFile[A](file : String)(f : FileReader => A) : Option[A] = {
     try {
