@@ -26,8 +26,8 @@ pmconcat cs = go where
   go [x] = x
   go xs  = go . withStrategy (parList rdeepseq) . map mconcat $ chunks cs xs
 
-solve :: (String -> Bool) -> String -> Int
-solve prefixPred input = go [0..]
+solve :: (String -> Bool) -> Int -> String -> Int
+solve prefixPred start input = go [start..]
   where
     bufsize = 10000
     chunksize = 200
@@ -50,5 +50,6 @@ solve prefixPred input = go [0..]
           $ show i
 
 main = do
-  print $ solve prefixFiveZeros input
-  print $ solve prefixSixZeros  input
+  let fiveZeros = solve prefixFiveZeros 0 input
+  print $ fiveZeros
+  print $ solve prefixSixZeros fiveZeros  input
