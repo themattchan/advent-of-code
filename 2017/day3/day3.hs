@@ -37,10 +37,6 @@ ringsize :: Int -> Int
 ringsize 0 = 1
 ringsize n = 8 * n
 
-corners :: Int -> [Int]
-corners 0 = [1]
-corners n = [ (2*n*m) + nthAnchor (n-1)| m <- [1,2,3,4]]
-
 nthOdd :: Integral a => a -> a
 nthOdd n = 2*n + 1
 
@@ -54,6 +50,11 @@ sides n = take 4 $ unfoldr go indexes
     indexes = drop (rs-1) $ cycle (take rs [0..])
     slen    = nthOdd n
     rs      = ringsize n
+
+-- indices of corners
+corners :: Int -> [Int]
+corners 0 = [1]
+corners n = map last (sides n)
 
 window :: Int -> [a] -> [[a]]
 window n xs = go (length xs - n + 1) xs
@@ -80,14 +81,13 @@ seq2 = concat $ go 0 [1]
         nextRing = [   (if i > 0 then nextRing !! (i-1) else 0)
                      -- numbers after a corner are neighbours with the corner
                      -- (above) and the number before the corner diagonally
-                     + (if idx `elem` afterCorners then nextRing !! (i-2) else 0)
+                     + (if i `elem` afterCorners then nextRing !! (i-2) else 0)
                      -- the last two numbers are neighbours with number 0 in this ring
-                     + (if idx >= (nthAnchor n') - 1 then nextRing !! 0 else 0)
+                     + (if i >= ringsize n' - 2 then nextRing !! 0 else 0)
                      + pns
-                   | (i, idx, pns) <- zip3 [0..] nextIdxs prevNeighbourSums
+                   | (i, pns) <- zip [0..] prevNeighbourSums
                    ]
         afterCorners = init $ map (+1) (corners n')
-        nextIdxs = [nthAnchor n + 1 .. nthAnchor n']
         prevNeighbourSums = map (sum . map (prevRing !!) . snd) $ prevNeighbours n'
 
 solve2 :: Integer -> Integer
