@@ -1,2 +1,4 @@
 .liquid
+*.o
+*.hi
 *.class
