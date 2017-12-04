@@ -105,10 +105,8 @@ object LightGrid {
                     .getOrElse(List())
                 }
 
-    // why the fuck doesn't this work
-    // ins foreach (solve1 andThen println)
-    ins foreach (x => println (solve1 (x)))
-    ins foreach (x => println (solve2 (x)))
+    ins foreach (solve1 _ andThen println _)
+    ins foreach (solve2 _ andThen println _)
   }
 
 }
