@@ -2,12 +2,6 @@ import java.io.FileReader
 import scala.util.parsing.combinator._
 
 object LightGrid {
-  type Coord = (Int,Int)
-  sealed abstract class Instr
-  case class On     (tl: Coord, br: Coord) extends Instr
-  case class Off    (tl: Coord, br: Coord) extends Instr
-  case class Toggle (tl: Coord, br: Coord) extends Instr
-
   object ParseInstrs extends JavaTokenParsers {
 
     override def skipWhitespace = true
@@ -41,16 +35,82 @@ object LightGrid {
     def parseInstrs = (parseOn | parseOff | parseTog)*
   }
 
+  type Coord = (Int,Int)
+  sealed trait Instr
+  case class On     (tl: Coord, br: Coord) extends Instr
+  case class Off    (tl: Coord, br: Coord) extends Instr
+  case class Toggle (tl: Coord, br: Coord) extends Instr
+
+  def inBounds (tl : Coord, br : Coord) : (Coord => Boolean) = {
+    val (tlx,tly) = tl
+    val (brx,bry) = br
+
+    { case (x,y) => (tlx <= x && x <= brx) && (tly <= y && y <= bry) }
+  }
+
+  val points =
+    for { x <- 0 to 999
+      y <- 0 to 999
+  } yield (x,y)
+
+  def applyCommands1 (pt : Coord, st0 : Boolean, commands : List[Instr]) : Boolean = {
+    commands.foldLeft (st0) { (st, comm) =>
+      comm match {
+        case On      (tl, br) if inBounds (tl, br) (pt) => true
+        case Off     (tl, br) if inBounds (tl, br) (pt) => false
+        case Toggle  (tl, br) if inBounds (tl, br) (pt) => ! st
+        case _ => st
+      }
+    }
+  }
+
+  def solve1 (commands : List[Instr]) : Int =
+    points.foldLeft (0) { (s,pt) => if (applyCommands1 (pt, false, commands)) s+1 else s }
+
+  def applyCommands2 (pt : Coord, st0 : Int, commands : List[Instr]) : Int = {
+    commands.foldLeft (st0) { (st, comm) =>
+      comm match {
+        case On      (tl, br) if inBounds (tl, br) (pt) => st + 1
+        case Off     (tl, br) if inBounds (tl, br) (pt) => 0 max (st - 1)
+        case Toggle  (tl, br) if inBounds (tl, br) (pt) => st + 2
+        case _ => st
+      }
+    }
+  }
+
+  def solve2 (commands : List[Instr]) : Int =
+    points.foldLeft (0) { (b, pt) => applyCommands2(pt, 0, commands) + b }
+
+
   // How do you do the actual problem... bit array? clever maths?
+//  def apply(
+
+  def bracketFile[A](file : String)(f : FileReader => A) : Option[A] = {
+    try {
+      val input = new FileReader(file)
+      val ret = Some (f (input))
+
+      input.close
+      ret
+    } catch { case e: Exception => {
+        println ("uh oh")
+        None
+      }
+    }
+  }
 
   def main(args: Array[String]) = {
-    val input = new FileReader("input.txt")
-    val ins = ParseInstrs
-      .parseAll(ParseInstrs.parseInstrs, input)
-      .getOrElse(List())
 
-    println(ins)
-    input.close
+    val ins = bracketFile("input.txt")
+                          { inp => ParseInstrs
+                                   .parseAll(ParseInstrs.parseInstrs, inp)
+                                   .getOrElse(List())
+                          }
+
+    // why the fuck doesn't this work
+    // ins foreach (solve1 andThen println)
+    ins foreach (x => println (solve1 (x)))
+    ins foreach (x => println (solve2 (x)))
   }
 
 }
