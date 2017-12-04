@@ -81,10 +81,10 @@ seq2 = concat $ go 0 [1]
                      -- the last two numbers are neighbours with number 0 in this ring
                      + (if i >= ringsize n' - 2 then nextRing !! 0 else 0)
                      + pns
-                   | (i, pns) <- zip [0..] prevNeighbourSums
+                   | (i, pns) <- prevNeighbourSums
                    ]
         afterCorners = init $ map (+1) (corners n')
-        prevNeighbourSums = map (sum . map (prevRing !!) . snd) $ prevNeighbours n'
+        prevNeighbourSums = map (fmap (sum . map (prevRing !!))) $ prevNeighbours n'
 
 solve2 :: Integer -> Integer
 solve2 input = head $ dropWhile (<= input) seq2
