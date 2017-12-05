@@ -24,7 +24,7 @@ instance Functor Zipper where
 
 zipLeft :: Int -> Zipper a -> Maybe (Zipper a)
 zipLeft 0 z = Just z
-zipLeft n z@(Zipper ([],_,_)) = Nothing
+zipLeft n (Zipper ([],_,_)) = Nothing
 zipLeft n (Zipper (l:ls,e,rs)) = zipLeft (n-1) (Zipper (ls, l, e:rs))
 
 zipRight :: Int -> Zipper a -> Maybe (Zipper a)
