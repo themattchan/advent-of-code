@@ -15,9 +15,6 @@ import Data.Int
 
 newtype Zipper a = Zipper ([a], a, [a])
 
-instance Functor Zipper where
-  fmap f (Zipper (ls, e, rs)) = Zipper (fmap f ls, f e, fmap f rs)
-
 zipLeft :: Int -> Zipper a -> Maybe (Zipper a)
 zipLeft 0 z = Just z
 zipLeft n (Zipper ([],_,_)) = Nothing
