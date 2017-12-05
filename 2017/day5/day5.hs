@@ -3,8 +3,6 @@
 {-# LANGUAGE
     TupleSections
   , BangPatterns
-  , MagicHash
-  , UnboxedTuples
   , ScopedTypeVariables
 #-}
 
@@ -13,9 +11,7 @@
 
 import Utils
 import qualified Data.Vector.Mutable as V
-import Data.IORef
 import Data.Int
-import GHC.IO(IO(IO))
 
 newtype Zipper a = Zipper ([a], a, [a])
 
@@ -69,39 +65,20 @@ main1 = do
 
 --------------------------------------------------------------------------------
 
-whileM :: IO Bool -> IO () -> IO ()
-whileM condition action = IO go
-  where
-    go world0 = case condition of
-      IO condAction -> case condAction world0 of
-        (# world1, cond #) ->
-          case cond of
-            False -> (# world1, () #)
-            True  -> case action of
-              IO actionAction -> case actionAction world1 of
-                (# world2, _ #) -> go world2
-
 solve' :: [Int64] -> (Int64 -> Int64) -> IO Int
 solve' input f = do
   let !size = length input
       !size64 = fromIntegral size :: Int64
   vector :: V.IOVector Int64 <- V.unsafeNew size
   forM_ (zip [0..] input) $ uncurry (V.unsafeWrite vector)
-  steps   :: IORef Int64 <- newIORef 0
-  currIdx :: IORef Int64 <- newIORef 0
-  whileM
-    ( do x <- readIORef currIdx
-         return $ x >= 0 && x < size64
-    )
-    ( do v <- readIORef currIdx
-         let v' = fromIntegral v
-         s <- V.unsafeRead vector v'
-         V.unsafeWrite vector v' (f s)
-         modifyIORef currIdx (+s)
-         modifyIORef steps   (+1)
-    )
-
-  fromIntegral <$> readIORef steps
+  go 0 0 size vector
+  where
+    go !steps !idx !end vec
+      | idx >= end = return steps
+      | otherwise = do
+          s <- V.unsafeRead vec idx
+          V.unsafeWrite vec idx (f s)
+          go (steps +1) (idx + (fromIntegral s)) end vec
 
 main2 :: IO ()
 main2 = do
@@ -158,4 +135,18 @@ Computation time: 6.840 sec
 
 foldr and foldl' are roughly the same with or without optimisation
 
+
+------------------------------------------------
+
+UPDATE:
+
+IORefs are really slow!
+
+(no optimisation, no ioref)
+IO MVector
+376976
+Computation time: 0.159 sec
+29227751
+Computation time: 15.125 sec
+Computation time: 15.284 sec
 -}
