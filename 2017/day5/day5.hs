@@ -9,7 +9,7 @@
 #-}
 
 -- Compile with:
---    stack ghc -- day5.hs -i ../../Utils.hs
+--    stack ghc -- day5.hs -O2 -i ../../Utils.hs
 
 import Utils
 import qualified Data.Vector.Mutable as V
@@ -135,4 +135,27 @@ Computation time: 0.524 sec
 29227751
 Computation time: 49.625 sec
 Computation time: 50.150 sec
+
+------------------------------------------------
+
+with -O2
+
+build/fold
+376976
+Computation time: 0.561 sec
+29227751
+Computation time: 1.673 sec
+Computation time: 2.235 sec
+
+IO MVector
+376976
+Computation time: 0.091 sec
+29227751
+Computation time: 6.748 sec
+Computation time: 6.840 sec
+
+------------------------------------------------
+
+foldr and foldl' are roughly the same with or without optimisation
+
 -}
