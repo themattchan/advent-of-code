@@ -81,18 +81,22 @@ whileM condition action = IO go
               IO actionAction -> case actionAction world1 of
                 (# world2, _ #) -> go world2
 
-solve' :: V.IOVector Int64 -> Int64 -> (Int64 -> Int64) -> IO Int
-solve' vector size f = do
+solve' :: [Int64] -> (Int64 -> Int64) -> IO Int
+solve' input f = do
+  let !size = length input
+      !size64 = fromIntegral size :: Int64
+  vector :: V.IOVector Int64 <- V.unsafeNew size
+  forM_ (zip [0..] input) $ uncurry (V.unsafeWrite vector)
   steps   :: IORef Int64 <- newIORef 0
   currIdx :: IORef Int64 <- newIORef 0
   whileM
     ( do x <- readIORef currIdx
-              return $ x >= 0 && x < size
+         return $ x >= 0 && x < size64
     )
     ( do v <- readIORef currIdx
          let v' = fromIntegral v
-         s <- V.read vector v'
-         V.write vector v' (f s)
+         s <- V.unsafeRead vector v'
+         V.unsafeWrite vector v' (f s)
          modifyIORef currIdx (+s)
          modifyIORef steps   (+1)
     )
@@ -101,14 +105,9 @@ solve' vector size f = do
 
 main2 :: IO ()
 main2 = do
-  input :: [Int64] <- map read . lines <$> readFile "input.txt"
-  let !size = length input
-      !size64 = fromIntegral size :: Int64
-  vector :: V.IOVector Int64 <- V.unsafeNew size
-  forM_ (zip [0..] input) $ uncurry (V.write vector)
-  timed $ print =<< solve' vector size64 (+1)
-  -- this is wrong somehow
-  timed $ print =<< solve' vector size64 part2Func
+  input <- map read . lines <$> readFile "input.txt"
+  timed $ print =<< solve' input (+1)
+  timed $ print =<< solve' input part2Func
 
 --------------------------------------------------------------------------------
 
@@ -132,8 +131,8 @@ Computation time: 16.698 sec
 
 IO MVector
 376976
-Computation time: 0.553 sec
-739
-Computation time: 0.001 sec
-Computation time: 0.556 sec
+Computation time: 0.494 sec
+29227751
+Computation time: 49.625 sec
+Computation time: 50.150 sec
 -}
