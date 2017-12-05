@@ -64,7 +64,6 @@ main1 = do
 solve' :: [Int64] -> (Int64 -> Int64) -> IO Int
 solve' input f = do
   let !size = length input
-      !size64 = fromIntegral size :: Int64
   vector :: V.IOVector Int64 <- V.unsafeNew size
   forM_ (zip [0..] input) $ uncurry (V.unsafeWrite vector)
   go 0 0 size vector
