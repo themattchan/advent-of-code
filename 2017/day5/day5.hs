@@ -30,12 +30,10 @@ modifyFoci f (Zipper (ls, e, rs)) = Zipper (ls, f e, rs)
 
 zipperFromList (x:xs) = Zipper ([], x, xs)
 
--- this is a bit slow
 solve1 :: Zipper Int -> Int
-solve1 = (+1) . length . unfoldr go where
-  go z = let n = viewFoci z
-             z' = modifyFoci (+1) z
-         in ((), ) <$> move n z'
+solve1 = foldr (+) 1 . unfoldr go
+  where
+    go = fmap (1, ) . uncurry move . (viewFoci &&& modifyFoci (+1))
 
 main :: IO ()
 main = do
