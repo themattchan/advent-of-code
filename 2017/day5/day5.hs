@@ -10,7 +10,7 @@
 --    stack ghc -- day5.hs -O2 -i ../../Utils.hs
 
 import Utils
-import qualified Data.Vector.Mutable as V
+import qualified Data.Vector.Unboxed.Mutable as V
 import Data.Int
 
 newtype Zipper a = Zipper ([a], a, [a])
