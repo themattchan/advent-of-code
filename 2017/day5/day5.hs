@@ -85,15 +85,16 @@ solve' :: V.IOVector Int64 -> Int64 -> (Int64 -> Int64) -> IO Int
 solve' vector size f = do
   steps   :: IORef Int64 <- newIORef 0
   currIdx :: IORef Int64 <- newIORef 0
-  whileM ( do x <- readIORef currIdx
+  whileM
+    ( do x <- readIORef currIdx
               return $ x >= 0 && x < size
-         ) $
+    )
     ( do v <- readIORef currIdx
          let v' = fromIntegral v
          s <- V.read vector v'
          V.write vector v' (f s)
-         modifyIORef steps (+1)
          modifyIORef currIdx (+s)
+         modifyIORef steps   (+1)
     )
 
   fromIntegral <$> readIORef steps
@@ -106,6 +107,7 @@ main2 = do
   vector :: V.IOVector Int64 <- V.unsafeNew size
   forM_ (zip [0..] input) $ uncurry (V.write vector)
   timed $ print =<< solve' vector size64 (+1)
+  -- this is wrong somehow
   timed $ print =<< solve' vector size64 part2Func
 
 --------------------------------------------------------------------------------
