@@ -4,6 +4,7 @@ module Utils
   , module Control.Arrow
   , module Control.Monad
   , module Data.Bifunctor
+  , module Data.Bool
   , module Data.Char
   , module Data.Maybe
   , module Data.Monoid
@@ -16,12 +17,14 @@ import Control.Arrow ((***), (&&&), (>>>), (<<<))
 import Control.Monad
 import Data.Bits
 import Data.Bifunctor
+import Data.Bool (bool)
 import Data.Char
 import Data.Maybe
 import Data.Monoid
 import Data.List
 import Data.Ord (comparing)
 import Text.Printf
+import System.CPUTime
 import qualified Numeric
 
 infixl 8 ...
@@ -34,6 +37,19 @@ showBin x = printf "%0*Lb" (finiteBitSize x) x
 
 numbers :: String -> [[Int]]
 numbers = map (map read . words) . lines
+
+-- from Haskell wiki
+timed :: IO a -> IO a
+timed action = do
+  start <- getCPUTime
+  v <- action
+  end <- getCPUTime
+  let diff = (fromIntegral (end - start)) / (10^12)
+  printf "Computation time: %0.3f sec\n" (diff :: Double)
+  return v
+
+dup :: a -> (a, a)
+dup = id &&& id
 
 --------------------------------------------------------------------------------
 
