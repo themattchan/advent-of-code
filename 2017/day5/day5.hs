@@ -124,14 +124,14 @@ main = do
 {-
 build/fold
 376976
-Computation time: 1.950 sec
+Computation time: 1.978 sec
 29227751
-Computation time: 14.747 sec
-Computation time: 16.698 sec
+Computation time: 15.504 sec
+Computation time: 17.483 sec
 
 IO MVector
 376976
-Computation time: 0.494 sec
+Computation time: 0.524 sec
 29227751
 Computation time: 49.625 sec
 Computation time: 50.150 sec
