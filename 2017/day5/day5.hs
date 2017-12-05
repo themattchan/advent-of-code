@@ -47,10 +47,6 @@ solve f = foldl' (+) 1 . unfoldr go
   where
     go = fmap (1, ) . uncurry move . (viewFoci &&& modifyFoci f)
 
---func :: Int -> Int -> Int
---func = uncurry (bool (+ 1) (- 1) . (>= 3)) . fmap (flip ($)) .  dup
--- (uncurry (bool (+ 1) (- 1) . (>= 3)) . fmap (flip ($)) .  dup)
-
 part2Func :: Integral a => a -> a
 part2Func x | x >= 3    = x-1
             | otherwise = x+1
