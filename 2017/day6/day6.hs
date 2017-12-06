@@ -5,6 +5,7 @@ import qualified Data.Map.Strict as M
 import qualified Data.Vector.Unboxed as V
 
 import Debug.Trace
+
 solve :: [Int] -> (Int, Int)
 solve = findRepeat . iterate redistribute . V.fromList
 
@@ -28,6 +29,7 @@ redistribute xs = xs'
     xs' = V.accum (+) (xs V.// [(mi,0)]) adds
 
 --------------------------------------------------------------------------------
+-- Lists only
 
 solve' :: [Int] -> (Int, Int)
 solve' = findRepeat' . uncurry iterate . (redistribute' . length &&& id)
@@ -43,7 +45,7 @@ findRepeat' = go 0 []
 
 -- BROKEN
 redistribute' :: Int -> [Int] -> [Int]
-redistribute' len xs = traceShow (maxI,order xs') xx
+redistribute' !len xs = traceShow (maxI,order xs') xx
   where
     xsi = zip [0..] xs
     (maxI, maxE) = maximumBy cmp xsi
