@@ -32,26 +32,39 @@ redistribute xs = xs'
 
 -- BROKEN
 redistribute' :: Int -> [Int] -> [Int]
-redistribute' len xs = traceShowId $ snd <$> order xs'
+redistribute' len xs = traceShow (maxI,order xs') xx
   where
     xsi = zip [0..] xs
-    (maxI, maxE) = maximumBy (compare `on` snd) xsi
+    (maxI, maxE) = maximumBy cmp xsi
+    cmp (a,b)(c,d) = if c1 == EQ then compare c a else c1
+      where c1 = compare b d
     (pre, (mi, m) : rest) = splitAt maxI xsi
 
-    xs' = take len
-        . drop (maxE - len)
-        . concat
-        . tail
+    xs' = uncurry (++)
+      -- TODO these numbers are wrong
+        . ( ( drop (maxE - len)
+            )
+            ***
+            ( take (max maxE (maxE - len))
+            . drop (maxE - len)
+            . concat
+            )
+          )
+        . fromJust
+        . uncons
         . iterate (map (fmap (+1)))
         $ rest ++ pre ++ [(mi, 0)]
 
     -- oldIndexOfZero = len-maxI-1
     -- newIdxOfZero = (oldIndexOfZero + (maxE - len)) `mod` len
     -- newIdxOfZero = (newIdxOfMi - maxI) `mod` len
-    order = uncurry (++) . swap . span ((/= 0) . fst)
+    --order = uncurry (++) . swap . span ((/= 0) . fst)
+    order = sortOn fst
+    xx =snd <$> order xs'
 
+test = [0,2,7,0]
 main = do
-  input <- map read . words <$> readFile "input.txt"
+--  input <- map read . words <$> readFile "input.txt"
   -- (14029,2765)
-  print $ solve input
-  print $ solve2 [0,2,7,0]
+  print $ solve test
+  print $ solve2 test
