@@ -53,10 +53,8 @@ corners :: Int -> [Int]
 corners = map head . sides
 
 window :: Int -> [a] -> [[a]]
-window n xs = go (length xs - n + 1) xs
-  where
-    go 0 _  = []
-    go w ys = take n ys : go (w-1) (tail ys)
+window n xs = take (length xs - n + 1)
+            $ unfoldr (Just . (take n &&& tail)) (cycle xs)
 
 -- (indicies of) neighbours of (indicies of) this ring in previous ring.
 prevNeighbours :: Int -> [(Int, [Int])]
