@@ -8,9 +8,6 @@ import Debug.Trace
 solve :: [Int] -> (Int, Int)
 solve = findRepeat . iterate redistribute . V.fromList
 
-solve2 :: [Int] -> (Int, Int)
-solve2 xs = findRepeat . iterate (redistribute' (length xs)) $ xs
-
 findRepeat :: (Ord a) => [a] -> (Int, Int)
 findRepeat = go M.empty 0
   where
@@ -29,6 +26,20 @@ redistribute xs = xs'
 
     adds = [(i `mod` len, 1) | i <- [mi+1 .. mi+e] ]
     xs' = V.accum (+) (xs V.// [(mi,0)]) adds
+
+--------------------------------------------------------------------------------
+
+solve' :: [Int] -> (Int, Int)
+solve' xs = findRepeat' . iterate (redistribute' (length xs)) $ xs
+
+findRepeat' :: (Ord a) => [a] -> (Int, Int)
+findRepeat' = go 0 []
+  where
+    go !steps seen (x:xs)
+      | Just relLastSeen <- x `elemIndex` seen
+      = (steps, relLastSeen + 1)
+      | otherwise
+      = go (steps +1) (x:seen) xs
 
 -- BROKEN
 redistribute' :: Int -> [Int] -> [Int]
@@ -64,7 +75,7 @@ redistribute' len xs = traceShow (maxI,order xs') xx
 
 test = [0,2,7,0]
 main = do
---  input <- map read . words <$> readFile "input.txt"
+  input <- map read . words <$> readFile "input.txt"
   -- (14029,2765)
-  print $ solve test
-  print $ solve2 test
+  print $ solve input
+--  print $ solve2 test
