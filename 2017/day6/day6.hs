@@ -30,7 +30,7 @@ redistribute xs = xs'
 --------------------------------------------------------------------------------
 
 solve' :: [Int] -> (Int, Int)
-solve' xs = findRepeat' . iterate (redistribute' (length xs)) $ xs
+solve' = findRepeat' . uncurry iterate . (redistribute' . length &&& id)
 
 findRepeat' :: (Ord a) => [a] -> (Int, Int)
 findRepeat' = go 0 []
