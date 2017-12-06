@@ -6,6 +6,8 @@ module Utils
   , module Data.Bifunctor
   , module Data.Bool
   , module Data.Char
+  , module Data.Function
+  , module Data.Tuple
   , module Data.Maybe
   , module Data.Monoid
   , module Data.List
@@ -19,6 +21,8 @@ import Data.Bits
 import Data.Bifunctor
 import Data.Bool (bool)
 import Data.Char
+import Data.Function (on)
+import Data.Tuple (swap)
 import Data.Maybe
 import Data.Monoid
 import Data.List
