@@ -49,9 +49,10 @@ object LightGrid {
   }
 
   val points =
-    for { x <- 0 to 999
-          y <- 0 to 999
-        } yield (x,y)
+    for {
+      x <- 0 to 999
+      y <- 0 to 999
+    } yield (x,y)
 
   def solve1 (commands : List[Instr]) : Int = {
     def applyCommands (pt : Coord, st0 : Boolean) = {
