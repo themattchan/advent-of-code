@@ -4,9 +4,9 @@ import Utils
 import qualified Data.Map.Strict as M
 import qualified Data.Vector.Unboxed as V
 
-solve = findSeen . iterate redistribute
+solve = findRepeat . iterate redistribute
 
-findSeen = go M.empty 0
+findRepeat = go M.empty 0
   where
     go !seen !steps (x:xs)
       | Just lastSeen <- x `M.lookup` seen
