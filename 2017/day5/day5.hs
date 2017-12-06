@@ -15,9 +15,6 @@ import Data.Int
 
 newtype Zipper a = Zipper ([a], a, [a])
 
-instance Functor Zipper where
-  fmap f (Zipper (ls, e, rs)) = Zipper (fmap f ls, f e, fmap f rs)
-
 zipLeft :: Int -> Zipper a -> Maybe (Zipper a)
 zipLeft 0 z = Just z
 zipLeft n (Zipper ([],_,_)) = Nothing
@@ -64,7 +61,6 @@ main1 = do
 solve' :: [Int64] -> (Int64 -> Int64) -> IO Int
 solve' input f = do
   let !size = length input
-      !size64 = fromIntegral size :: Int64
   vector :: V.IOVector Int64 <- V.unsafeNew size
   forM_ (zip [0..] input) $ uncurry (V.unsafeWrite vector)
   go 0 0 size vector
