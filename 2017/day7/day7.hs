@@ -106,6 +106,9 @@ findDiscrepancy = go . roseLevel . annot (Sum . idWeight)
         -- This list is clean
         Nothing -> Nothing
 
+--- TODO should have done this with another monoid... sigh i shouldn't code at 3am
+
+
 test = fromJust . towers $ unlines
   [ "pbga (66)"
   , "xhth (57)"
