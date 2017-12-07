@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 module Utils
   ( module Utils
   , module Control.Applicative
@@ -105,8 +106,12 @@ alpha = many (oneof ['a'..'z'])
 string :: String -> Parser String
 string = mapM char
 
-literal s x = string s *> pure x
+literal = curry (uncurry (*>) . (string *** pure))
 
 eat = flip replicateM_ take1
 
 between p q = (p *>) . (<* q)
+
+parens = between (char '(') (char ')')
+
+takeAll = Parser $ pure . (, "")
