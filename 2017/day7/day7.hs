@@ -59,19 +59,18 @@ roseLevel (Rose e ls) = ls
 --     m   = f a <> foldMap (fst . roseRoot) as'
 --     as' = map (annot f) as
 
-propagate :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
-propagate f (Rose a as) = Rose (m, a) as'
-  where
-    m   = foldMap (f . roseRoot) as <> foldMap (fst . roseRoot) as'
-    as' = map (propagate f) as
-
 diff ::  Monoid m => (a -> m) -> Rose a -> Rose ((m, m), a)
-diff f = fmap add . propagate f
+diff f (Rose a as) = Rose (m', a) as'
   where
-    add (m, a) = ((m <> f a, m), a)
+    m'  = (m <> f a, m)
+    m   = foldMap (fst . fst . roseRoot) as'
+    as' = map (diff f) as
 
 annot :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
 annot f = fmap (first fst) . diff f
+
+propagate :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
+propagate f = fmap (first snd) . diff f
 
 paths :: Rose a -> [[a]]
 paths (Rose a []) = [[a]]
@@ -91,12 +90,12 @@ structure = go . (findRoot &&& M.fromList . map (towerId &&& towerKids))
                                  , kid       <- kids
                                  ]
 
-findDiscrepancy :: Rose Id -> Int
-findDiscrepancy = diff (Sum . idWeight)
+--findDiscrepancy :: Rose Id -> Int
+--findDiscrepancy = diff (Sum . idWeight)
 
 
 main :: IO ()
 main = do
   Just i <- towers <$> readFile "input.txt"
-  print $ weighted $ structure i
+--  print $ weighted $ structure i
   print $ findRoot i
