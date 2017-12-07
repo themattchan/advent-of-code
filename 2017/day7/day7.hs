@@ -1,6 +1,7 @@
 #! /usr/bin/env runhaskell -i../../
-{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFunctor, PatternGuards #-}
 import Utils
+import Debug.Trace
 import Data.List.Split (splitOn)
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
@@ -90,10 +91,30 @@ structure = go . (findRoot &&& M.fromList . map (towerId &&& towerKids))
                                  , kid       <- kids
                                  ]
 
-findDiscrepancy :: Rose Id -> Int
+findDiscrepancy :: Rose Id -> Maybe Int
 findDiscrepancy = go . roseLevel . diff (Sum . idWeight)
   where
-    go leaves =
+    weightOf = idWeight . snd . roseRoot
+    findBad = classify . f
+      where
+        cmp = fst . fst . roseRoot
+        f = map head . sortOn length . groupBy ((==) `on` cmp) . sortOn cmp
+        classify xs
+          | [bad, good] <- xs = Just (bad, good)
+          | [_good]     <- xs = Nothing
+          | otherwise         = error "BOOM"
+
+    go level =
+      -- First, find the bad one in this list of nodes
+      case findBad level of
+        Just (bad, good) ->
+          -- Next, check if the bad one is in this node or its children
+          case findBad (roseLevel bad) of
+            Just (bad1, good1) -> go (roseLevel bad1)
+            Nothing -> Just $ abs $ weightOf bad - weightOf good
+
+        -- This list is clean
+        Nothing -> Nothing
 
 main :: IO ()
 main = do
