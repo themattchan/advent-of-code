@@ -90,12 +90,13 @@ structure = go . (findRoot &&& M.fromList . map (towerId &&& towerKids))
                                  , kid       <- kids
                                  ]
 
---findDiscrepancy :: Rose Id -> Int
---findDiscrepancy = diff (Sum . idWeight)
-
+findDiscrepancy :: Rose Id -> Int
+findDiscrepancy = go . roseLevel . diff (Sum . idWeight)
+  where
+    go leaves =
 
 main :: IO ()
 main = do
   Just i <- towers <$> readFile "input.txt"
---  print $ weighted $ structure i
   print $ findRoot i
+  print $ (findDiscrepancy . structure) i
