@@ -78,17 +78,18 @@ structure = go . (findRoot &&& M.fromList . map (towerId &&& towerKids))
                                  , kid       <- kids
                                  ]
 
-findDiscrepancy :: Rose Id -> Maybe (Sum Int)
+findDiscrepancy :: Rose Id -> Maybe Int
 findDiscrepancy = go . roseLevel . annot (Sum . idWeight)
   where
     subtreeWeight = fst . roseRoot
+    nodeWeight = idWeight . snd . roseRoot
 
     findBad = classify . f
       where
         cmp = fst . roseRoot
         f = map head . sortOn length . groupBy ((==) `on` cmp) . sortOn cmp
         classify xs
-          | [bad, good] <- xs = traceShowId $ Just (bad, good)
+          | [bad, good] <- xs = Just (bad, good)
           | [_good]     <- xs = Nothing
           | otherwise         = error "BOOM"
 
@@ -99,7 +100,8 @@ findDiscrepancy = go . roseLevel . annot (Sum . idWeight)
           -- Next, check if the bad one is in this node or its children
           case findBad (roseLevel bad) of
             Just (bad1, good1) -> go (roseLevel bad1)
-            Nothing -> Just $ abs $ subtreeWeight bad - subtreeWeight good
+            Nothing -> let d = subtreeWeight bad - subtreeWeight good
+                       in Just (nodeWeight bad - getSum d)
 
         -- This list is clean
         Nothing -> Nothing
