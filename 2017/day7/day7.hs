@@ -78,17 +78,17 @@ structure = go . (findRoot &&& M.fromList . map (towerId &&& towerKids))
                                  , kid       <- kids
                                  ]
 
-findDiscrepancy :: Rose Id -> Maybe Int
+findDiscrepancy :: Rose Id -> Maybe (Sum Int)
 findDiscrepancy = go . roseLevel . annot (Sum . idWeight)
   where
-    weightOf = idWeight . snd . roseRoot
+    subtreeWeight = fst . roseRoot
 
     findBad = classify . f
       where
         cmp = fst . roseRoot
         f = map head . sortOn length . groupBy ((==) `on` cmp) . sortOn cmp
         classify xs
-          | [bad, good] <- xs = Just (bad, good)
+          | [bad, good] <- xs = traceShowId $ Just (bad, good)
           | [_good]     <- xs = Nothing
           | otherwise         = error "BOOM"
 
@@ -99,7 +99,7 @@ findDiscrepancy = go . roseLevel . annot (Sum . idWeight)
           -- Next, check if the bad one is in this node or its children
           case findBad (roseLevel bad) of
             Just (bad1, good1) -> go (roseLevel bad1)
-            Nothing -> Just $ abs $ weightOf bad - weightOf good
+            Nothing -> Just $ abs $ subtreeWeight bad - subtreeWeight good
 
         -- This list is clean
         Nothing -> Nothing
@@ -125,6 +125,5 @@ test = fromJust . towers $ unlines
 main :: IO ()
 main = do
   Just i <- towers <$> readFile "input.txt"
-  print $ findRoot test
-  -- should be 8
-  print $ (findDiscrepancy . structure) test
+  print $ findRoot i
+  print $ (findDiscrepancy . structure) i
