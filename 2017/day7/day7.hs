@@ -54,11 +54,24 @@ roseRoot (Rose e _) = e
 roseLevel :: Rose a -> [Rose a]
 roseLevel (Rose e ls) = ls
 
-annot :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
-annot f (Rose a as) = Rose (m, a) as'
+-- annot :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
+-- annot f (Rose a as) = Rose (m, a) as'
+--   where
+--     m   = f a <> foldMap (fst . roseRoot) as'
+--     as' = map (annot f) as
+
+diff ::  Monoid m => (a -> m) -> Rose a -> Rose ((m, m), a)
+diff f (Rose a as) = Rose (m', a) as'
   where
-    m   = f a <> foldMap (fst . roseRoot) as'
-    as' = map (annot f) as
+    m'  = (m <> f a, m)
+    m   = foldMap (fst . fst . roseRoot) as'
+    as' = map (diff f) as
+
+annot :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
+annot f = fmap (first fst) . diff f
+
+propagate :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
+propagate f = fmap (first snd) . diff f
 
 paths :: Rose a -> [[a]]
 paths (Rose a []) = [[a]]
@@ -107,7 +120,7 @@ findDiscrepancy = go . roseLevel . annot (Sum . idWeight)
         Nothing -> Nothing
 
 --- TODO should have done this with another monoid... sigh i shouldn't code at 3am
-
+-- annot, then PROPAGATE annots with a "diff" monoid
 
 test = fromJust . towers $ unlines
   [ "pbga (66)"
