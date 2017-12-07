@@ -82,6 +82,7 @@ findDiscrepancy :: Rose Id -> Maybe Int
 findDiscrepancy = go . roseLevel . annot (Sum . idWeight)
   where
     weightOf = idWeight . snd . roseRoot
+
     findBad = classify . f
       where
         cmp = fst . roseRoot
@@ -103,8 +104,27 @@ findDiscrepancy = go . roseLevel . annot (Sum . idWeight)
         -- This list is clean
         Nothing -> Nothing
 
+test = fromJust . towers $ unlines
+  [ "pbga (66)"
+  , "xhth (57)"
+  , "ebii (61)"
+  , "havc (66)"
+  , "ktlj (57)"
+  , "fwft (72) -> ktlj, cntj, xhth"
+  , "qoyq (66)"
+  , "padx (45) -> pbga, havc, qoyq"
+  , "tknk (41) -> ugml, padx, fwft"
+  , "jptl (61)"
+  , "ugml (68) -> gyxo, ebii, jptl"
+  , "gyxo (61)"
+  , "cntj (57)"
+  ]
+
+
+
 main :: IO ()
 main = do
   Just i <- towers <$> readFile "input.txt"
-  print $ findRoot i
-  print $ (findDiscrepancy . structure) i
+  print $ findRoot test
+  -- should be 8
+  print $ (findDiscrepancy . structure) test
