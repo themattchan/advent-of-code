@@ -9,10 +9,10 @@ type Registers = M.Map String (Max Int, Int)
 
 runCommands :: Registers -> String -> Registers
 runCommands r l = case words l of
-  [rMod, comm, n, "if", rDep, op, m] ->
+  [rMod, comm, n, "if", rDep, cmp, m] ->
     let f | comm == "inc" = (+ (read n))
           | otherwise     = subtract (read n)
-        g = flip (parseOp op) (read m)
+        g = flip (parseCmp cmp) (read m)
 
         alterOp
           | g $ maybe 0 snd (M.lookup rDep r)
@@ -24,14 +24,14 @@ runCommands r l = case words l of
 
   _ -> error $ "DIE " ++ l
 
-parseOp :: String -> Int -> Int -> Bool
-parseOp ">"  = (>)
-parseOp "<"  = (<)
-parseOp ">=" = (>=)
-parseOp "<=" = (<=)
-parseOp "==" = (==)
-parseOp "!=" = (/=)
-parseOp x    = error $ "DIE " ++ x
+parseCmp :: String -> Int -> Int -> Bool
+parseCmp ">"  = (>)
+parseCmp "<"  = (<)
+parseCmp ">=" = (>=)
+parseCmp "<=" = (<=)
+parseCmp "==" = (==)
+parseCmp "!=" = (/=)
+parseCmp x    = error $ "DIE " ++ x
 
 solve :: [String] -> (Max Int, Max Int)
 solve = swap . foldMap (id *** Max) . foldl runCommands mempty
