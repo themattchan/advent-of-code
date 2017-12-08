@@ -5,6 +5,7 @@ import Debug.Trace
 import Data.List.Split (splitOn)
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
+import Data.Semigroup hiding ((<>))
 
 -- * Data types
 
@@ -54,32 +55,72 @@ roseRoot (Rose e _) = e
 roseLevel :: Rose a -> [Rose a]
 roseLevel (Rose e ls) = ls
 
--- annot :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
--- annot f (Rose a as) = Rose (m, a) as'
---   where
---     m   = f a <> foldMap (fst . roseRoot) as'
---     as' = map (annot f) as
-
-diff ::  Monoid m => (a -> m) -> Rose a -> Rose ((m, m), a)
-diff f (Rose a as) = Rose (m', a) as'
-  where
-    m'  = (m <> f a, m)
-    m   = foldMap (fst . fst . roseRoot) as'
-    as' = map (diff f) as
-
 annot :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
-annot f = fmap (first fst) . diff f
+annot f (Rose a as) = Rose (m, a) as'
+  where
+    m   = f a <> foldMap (fst . roseRoot) as'
+    as' = map (annot f) as
+
+-- diff ::  Monoid m => (a -> m) -> Rose a -> Rose ((m, m), a)
+-- diff f (Rose a as) = Rose (m', a) as'
+--   where
+--     m'  = (m <> f a, m)
+--     m   = foldMap (fst . fst . roseRoot) as'
+--     as' = map (diff f) as
+
+-- annot :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
+-- annot f = fmap (first fst) . diff f
 
 propagate :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
-propagate f = fmap (first snd) . diff f
+propagate f (Rose a as) = Rose (m, a) as'
+  where
+    m   = foldMap (f . roseRoot) as <> foldMap (fst . roseRoot) as'
+    as' = map (propagate f) as
+
+-- Summarise info about a node's children to a node
+levelUp :: Monoid m => (a -> m) -> Rose a -> Rose (m, a)
+levelUp f (Rose a as) = Rose (m, a) as'
+ where
+   m   = foldMap (f . roseRoot) as
+   as' = map (levelUp f) as
 
 paths :: Rose a -> [[a]]
 paths (Rose a []) = [[a]]
 paths (Rose a as) = [ a : ps | ps <- foldMap paths as ]
 
+testRose :: Rose Int
 testRose = Rose 1 [ Rose 2 [Rose 3 []]
                   , Rose 4 []
                   , Rose 5 [Rose 6 [Rose 7 []]]]
+
+-- Monoid to track differences
+
+newtype Diff a = Diff (Min a, Max a)
+  deriving (Ord, Eq, Bounded)
+
+instance (Bounded a, Ord a, Eq a) => Show (Diff a) where
+  show = show . isDiff
+
+-- propagate (mkDiff . fst) . annot (Sum . idWeight) . structure $ test
+
+mkDiff :: (Bounded a, Ord a, Eq a) => a -> Diff a
+mkDiff = Diff . (Min &&& Max)
+
+isDiff :: (Bounded a, Ord a, Eq a) => Diff a -> Bool
+isDiff d@(Diff (Min x, Max y))
+  | d == mempty = False
+  | x == y      = False
+  | otherwise   = True
+
+getDiff :: (Num a, Bounded a, Ord a, Eq a) => Diff a -> a
+getDiff (Diff (Min x, Max y)) = y - x
+
+instance (Eq a, Ord a, Bounded a) => Monoid (Diff a) where
+  mempty = Diff (mempty, mempty)
+  Diff (min1, max1) `mappend` Diff (min2, max2)
+    = Diff (min1 <> min2, max1 <> max2)
+
+-- turn (Sum Int, Id) into a diffable thing
 
 -- * Part 2
 
@@ -90,6 +131,8 @@ structure = go . (findRoot &&& M.fromList . map (towerId &&& towerKids))
                                  | Just kids <- [M.lookup root nodes]
                                  , kid       <- kids
                                  ]
+
+--foo = propagate . annot (Sum . idWeight)
 
 findDiscrepancy :: Rose Id -> Maybe Int
 findDiscrepancy = go . roseLevel . annot (Sum . idWeight)

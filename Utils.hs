@@ -8,6 +8,7 @@ module Utils
   , module Data.Bool
   , module Data.Char
   , module Data.Function
+--  , module Data.Semigroup
   , module Data.Tuple
   , module Data.Maybe
   , module Data.Monoid
@@ -23,6 +24,7 @@ import Data.Bifunctor
 import Data.Bool (bool)
 import Data.Char
 import Data.Function (on)
+--import Data.Semigroup
 import Data.Tuple (swap)
 import Data.Maybe
 import Data.Monoid
