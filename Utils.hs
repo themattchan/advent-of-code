@@ -34,9 +34,101 @@ import Text.Printf
 import System.CPUTime
 import qualified Numeric
 
-infixl 8 ...
+--------------------------------------------------------------------------------
+-- * Algebra
+
 (...) :: (c -> d) -> (a -> b -> c) -> (a -> b -> d)
 (...) = (.).(.)
+{-# INLINE (...) #-}
+infixl 8 ...
+
+dup :: a -> (a, a)
+dup = id &&& id
+
+assocl :: (a, (b, c)) -> ((a, b), c)
+assocl ~(a, (b, c)) = ((a, b), c)
+
+assocr :: ((a, b), c) -> (a, (b, c))
+assocr ~((a, b), c) = (a, (b, c))
+
+--------------------------------------------------------------------------------
+-- * Parser combinators
+
+-- | "A parser for things is a function from strings to a list of pairs of things and strings"
+newtype Parser a = Parser { parse :: String -> [(a,String)] }
+
+runParser :: Parser a -> String -> Maybe a
+runParser = fmap fst . mfilter (null.snd) . listToMaybe ... parse
+
+runParserPartial :: Parser a -> String -> Maybe a
+runParserPartial = fmap fst . listToMaybe ... parse
+
+instance Functor Parser where
+  fmap f p = Parser $ map (first f) . parse p
+
+instance Applicative Parser where
+  pure = Parser . (pure ... (,))
+  pf <*> pa = Parser $ concatMap (uncurry (fmap.first))
+                     . map (id *** parse pa) . parse pf
+
+joinParser :: Parser (Parser a) -> Parser a
+joinParser = Parser . (concatMap (uncurry parse) ... parse)
+
+instance Monad Parser where
+  (>>=) = joinParser ... flip fmap
+
+instance MonadPlus Parser where
+  mzero = Parser $ const []
+  p `mplus` q = Parser $ uncurry mappend . (parse p &&& parse q)
+
+instance Alternative Parser where
+  empty = mzero
+  p <|> q = Parser $ uncurry (<|>) . (parse p &&& parse q)
+
+take1 :: Parser Char
+take1 = Parser $ maybeToList . uncons
+
+satisfy :: (Char -> Bool) -> Parser Char
+satisfy = flip mfilter take1
+
+oneof :: String -> Parser Char
+oneof = satisfy . flip elem
+
+char :: Char -> Parser Char
+char = satisfy . (==)
+
+sepBy :: Parser a -> Parser b -> Parser [a]
+sepBy p s = many ((p <* s) <|> p)
+
+num :: Parser Int
+num = read <$> some (satisfy isDigit)
+
+spaces :: Parser String
+spaces = many (oneof "\t\n ")
+
+alpha :: Parser String
+alpha = many (oneof ['a'..'z'])
+
+string :: String -> Parser String
+string = mapM char
+
+literal :: String -> a -> Parser a
+literal = curry (uncurry (*>) . (string *** pure))
+
+eat :: Int -> Parser ()
+eat = flip replicateM_ take1
+
+between :: Parser a -> Parser b -> Parser c -> Parser c
+between p q = (p *>) . (<* q)
+
+parens :: Parser a -> Parser a
+parens = between (char '(') (char ')')
+
+takeAll :: Parser String
+takeAll = Parser $ pure . (, "")
+
+--------------------------------------------------------------------------------
+-- * Misc
 
 showBin, showHex :: (Integral a, PrintfArg a, FiniteBits a) => a -> String
 showHex x = printf "%0*Lx" (finiteBitSize x) x
@@ -54,72 +146,3 @@ timed action = do
   let diff = (fromIntegral (end - start)) / (10^12)
   printf "Computation time: %0.3f sec\n" (diff :: Double)
   return v
-
-dup :: a -> (a, a)
-dup = id &&& id
-
-assocl :: (a, (b, c)) -> ((a, b), c)
-assocl ~(a, (b, c)) = ((a, b), c)
-
-assocr :: ((a, b), c) -> (a, (b, c))
-assocr ~((a, b), c) = (a, (b, c))
-
---------------------------------------------------------------------------------
-
--- "A parser for things is a function from strings to a list of pairs of things and strings"
-newtype Parser a = Parser { parse :: String -> [(a,String)] }
-
-runParser = fmap fst . mfilter (null.snd) . listToMaybe ... parse
-
-runParserPartial = fmap fst . listToMaybe ... parse
-
-instance Functor Parser where
-  fmap f p = Parser $ map (first f) . parse p
-
-instance Applicative Parser where
-  pure = Parser . (pure ... (,))
-  pf <*> pa = Parser $ concatMap (uncurry (fmap.first))
-                     . map (id *** parse pa) . parse pf
-
-joinParser = Parser . (concatMap (uncurry parse) ... parse)
-instance Monad Parser where
-  (>>=) = joinParser ... flip fmap
-
-instance MonadPlus Parser where
-  mzero = Parser $ const []
-  p `mplus` q = Parser $ uncurry mappend . (parse p &&& parse q)
-
-instance Alternative Parser where
-  empty = mzero
-  p <|> q = Parser $ uncurry (<|>) . (parse p &&& parse q)
-
-take1 = Parser $ maybeToList . uncons
-
-satisfy = flip mfilter take1
-
-oneof = satisfy . flip elem
-
-char = satisfy . (==)
-
-sepBy p s = many ((p <* s) <|> p)
-
-num :: Parser Int
-num = read <$> some (satisfy isDigit)
-
-spaces = many (oneof "\t\n ")
-
-alpha :: Parser String
-alpha = many (oneof ['a'..'z'])
-
-string :: String -> Parser String
-string = mapM char
-
-literal = curry (uncurry (*>) . (string *** pure))
-
-eat = flip replicateM_ take1
-
-between p q = (p *>) . (<* q)
-
-parens = between (char '(') (char ')')
-
-takeAll = Parser $ pure . (, "")
