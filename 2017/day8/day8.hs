@@ -14,7 +14,12 @@ runCommand r l = case words l of
         g = flip (parseCmp cmp) (read m)
 
         h | g $ maybe 0 snd (M.lookup rCmp r)
-          = pure . first (uncurry mappend) . assocl . fmap ((Max &&& id) . f) . fromMaybe (pure 0)
+          = pure
+          . uncurry (*>)
+          . fmap ((Max &&& id) . f . snd)
+          . dup
+          . fromMaybe (pure 0)
+
           | otherwise
           = id
     in
