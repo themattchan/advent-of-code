@@ -22,7 +22,7 @@ runCommands r l = case words l of
     in
       M.alter alterOp rMod r
 
-  _ -> error "DIE"
+  _ -> error $ "DIE " ++ l
 
 parseOp :: String -> Int -> Int -> Bool
 parseOp ">"  = (>)
