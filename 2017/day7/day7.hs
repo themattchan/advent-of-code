@@ -95,7 +95,7 @@ testRose = Rose 1 [ Rose 2 [Rose 3 []]
 
 -- Monoid to track differences
 
-newtype Diff a = Diff (Min a, Max a)
+newtype Diff a = Diff (M.Map a (Sum Int))
   deriving (Ord, Eq, Bounded)
 
 instance (Bounded a, Ord a, Eq a) => Show (Diff a) where
@@ -104,7 +104,7 @@ instance (Bounded a, Ord a, Eq a) => Show (Diff a) where
 -- propagate (mkDiff . fst) . annot (Sum . idWeight) . structure $ test
 
 mkDiff :: (Bounded a, Ord a, Eq a) => a -> Diff a
-mkDiff = Diff . (Min &&& Max)
+mkDiff x = Diff (Min x, Max x, M.singleton x (Sum 1))
 
 isDiff :: (Bounded a, Ord a, Eq a) => Diff a -> Bool
 isDiff d@(Diff (Min x, Max y))
@@ -116,8 +116,8 @@ getDiff :: (Num a, Bounded a, Ord a, Eq a) => Diff a -> a
 getDiff (Diff (Min x, Max y)) = y - x
 
 instance (Eq a, Ord a, Bounded a) => Monoid (Diff a) where
-  mempty = Diff (mempty, mempty)
-  Diff (min1, max1) `mappend` Diff (min2, max2)
+  mempty = Diff (mempty, mempty, mempty)
+  Diff (min1, max1, counts1) `mappend` Diff (min2, max2, counts2)
     = Diff (min1 <> min2, max1 <> max2)
 
 -- turn (Sum Int, Id) into a diffable thing

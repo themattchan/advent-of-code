@@ -58,6 +58,12 @@ timed action = do
 dup :: a -> (a, a)
 dup = id &&& id
 
+assocl :: (a, (b, c)) -> ((a, b), c)
+assocl ~(a, (b, c)) = ((a, b), c)
+
+assocr :: ((a, b), c) -> (a, (b, c))
+assocr ~((a, b), c) = (a, (b, c))
+
 --------------------------------------------------------------------------------
 
 -- "A parser for things is a function from strings to a list of pairs of things and strings"
