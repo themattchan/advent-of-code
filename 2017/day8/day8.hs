@@ -14,13 +14,12 @@ runCommands r l = case words l of
           | otherwise     = subtract (read n)
         g = flip (parseCmp cmp) (read m)
 
-        alterOp
-          | g $ maybe 0 snd (M.lookup rDep r)
+        h | g $ maybe 0 snd (M.lookup rDep r)
           = pure . first (uncurry mappend) . assocl . fmap ((Max &&& id) . f) . fromMaybe (pure 0)
           | otherwise
           = id
     in
-      M.alter alterOp rMod r
+      M.alter h rMod r
 
   _ -> error $ "DIE " ++ l
 
