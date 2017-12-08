@@ -9,12 +9,12 @@ type Registers = M.Map String (Max Int, Int)
 
 runCommands :: Registers -> String -> Registers
 runCommands r l = case words l of
-  [rMod, comm, n, "if", rDep, cmp, m] ->
+  [rMod, comm, n, "if", rCmp, cmp, m] ->
     let f | comm == "inc" = (+ (read n))
           | otherwise     = subtract (read n)
         g = flip (parseCmp cmp) (read m)
 
-        h | g $ maybe 0 snd (M.lookup rDep r)
+        h | g $ maybe 0 snd (M.lookup rCmp r)
           = pure . first (uncurry mappend) . assocl . fmap ((Max &&& id) . f) . fromMaybe (pure 0)
           | otherwise
           = id
