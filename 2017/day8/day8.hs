@@ -5,8 +5,8 @@ import Data.Semigroup
 
 type Registers = M.Map String (Max Int, Int)
 
-runCommands :: Registers -> String -> Registers
-runCommands r l = case words l of
+runCommand :: Registers -> String -> Registers
+runCommand r l = case words l of
   [rMod, comm, n, "if", rCmp, cmp, m] ->
     let f | comm == "inc" = (+ (read n))
           | otherwise     = subtract (read n)
@@ -32,7 +32,7 @@ parseCmp "!=" = (/=)
 parseCmp x    = error $ "DIE " ++ x
 
 solve :: [String] -> (Max Int, Max Int)
-solve = swap . foldMap (id *** Max) . foldl runCommands mempty
+solve = swap . foldMap (id *** Max) . foldl runCommand mempty
 
 main :: IO ()
 main = readFile "input.txt" >>= print . solve . lines
