@@ -1,9 +1,7 @@
 #! /usr/bin/env runhaskell -i../../
-{-# LANGUAGE DeriveFunctor, PatternGuards #-}
 import Utils
 import qualified Data.Map as M
 import Data.Semigroup
-import Debug.Trace
 
 type Registers = M.Map String (Max Int, Int)
 
@@ -12,6 +10,7 @@ runCommands r l = case words l of
   [rMod, comm, n, "if", rCmp, cmp, m] ->
     let f | comm == "inc" = (+ (read n))
           | otherwise     = subtract (read n)
+
         g = flip (parseCmp cmp) (read m)
 
         h | g $ maybe 0 snd (M.lookup rCmp r)
