@@ -37,7 +37,7 @@ parseCmp "!=" = (/=)
 parseCmp x    = error $ "DIE " ++ x
 
 solve :: [String] -> (Max Int, Max Int)
-solve = swap . foldMap (id *** Max) . foldl runCommand mempty
+solve = swap . foldMap (fmap Max) . foldl runCommand mempty
 
 main :: IO ()
 main = readFile "input.txt" >>= timed . print . solve . lines
