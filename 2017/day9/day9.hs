@@ -18,4 +18,4 @@ solve = go 0 0 0 . unbang
     unbang (x:xs)         = x : unbang xs
 
 main :: IO ()
-main = readFile "input.txt" >>= print . solve
+main = readFile "input.txt" >>= timed . print . solve
