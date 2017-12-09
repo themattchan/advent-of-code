@@ -3,7 +3,7 @@
 import Utils
 
 solve :: String -> (Int, Int)
-solve = go 0 0 0 . rmbang
+solve = go 0 0 0 . unbang
   where
     go !l !s !g = \case
       []     -> (s,g)
@@ -13,9 +13,9 @@ solve = go 0 0 0 . rmbang
                 in go l s (g+length gs) rest
       _ : xs -> go l s g xs
 
-    rmbang [] = []
-    rmbang ('!' : _ : xs) = rmbang xs
-    rmbang (x:xs) = x : rmbang xs
+    unbang []             = []
+    unbang ('!' : _ : xs) = unbang xs
+    unbang (x:xs)         = x : unbang xs
 
 main :: IO ()
 main = readFile "input.txt" >>= print . solve
