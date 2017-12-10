@@ -34,7 +34,7 @@ import Data.List
 import Data.Ord (comparing)
 import Text.Printf
 import System.CPUTime
-import qualified Numeric
+import Numeric (showHex, showIntAtBase)
 
 --------------------------------------------------------------------------------
 -- * Algebra
@@ -132,9 +132,17 @@ takeAll = Parser $ pure . (, "")
 --------------------------------------------------------------------------------
 -- * Misc
 
-showBin, showHex :: (Integral a, PrintfArg a, FiniteBits a) => a -> String
-showHex x = printf "%0*Lx" (finiteBitSize x) x
-showBin x = printf "%0*Lb" (finiteBitSize x) x
+myShowBin, myShowHex :: (Integral a, PrintfArg a, FiniteBits a) => a -> String
+myShowHex x = printf "%0*Lx" (finiteBitSize x) x
+myShowBin x = printf "%0*Lb" (finiteBitSize x) x
+
+showHex' :: (Integral a, Show a) => a -> String
+showHex' n = case showHex n "" of
+               [x] -> ['0',x]
+               xs -> xs
+
+showIntAtBase' :: (Integral a, Show a) => a -> a -> String
+showIntAtBase' b n = showIntAtBase b intToDigit n ""
 
 numbers :: String -> [[Int]]
 numbers = map (map read . words) . lines
