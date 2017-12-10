@@ -5,7 +5,7 @@ import Data.Bits (xor)
 import Data.List.Split (chunksOf)
 import Debug.Trace
 import Data.Word
-import Control.Exception.Base
+import Control.Exception.Base (assert)
 
 type State = ([Int], Int, Int, Int)
   -- ^ list being hashed, length of list, actual index of head, skip size
