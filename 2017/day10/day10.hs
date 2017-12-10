@@ -8,7 +8,7 @@ import Data.Word
 import Control.Exception.Base
 
 type State = ([Int], Int, Int, Int)
-  -- ^ list being encoded, length of list, actual index of head, skip size
+  -- ^ list being hashed, length of list, actual index of head, skip size
 
 initState :: [Int] -> State
 initState xs = (xs,length xs,0,0)
