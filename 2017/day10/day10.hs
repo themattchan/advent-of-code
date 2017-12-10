@@ -1,5 +1,4 @@
 #! /usr/bin/env runhaskell -i../../
-{-# LANGUAGE LambdaCase, BangPatterns #-}
 import Utils
 import Data.Bits (xor)
 import Data.List.Split (chunksOf)
