@@ -8,7 +8,7 @@ import qualified Data.Map as M
 type Circuit a = State (M.Map String Int) a
 
 getVal :: String -> Circuit Int
-getVal v = gets (fromJust . M.lookup v)
+getVal v = gets (fromMaybe (error v) . M.lookup v)
 
 parseLine :: Parser (Circuit ())
 parseLine = do
@@ -41,7 +41,7 @@ parseLine = do
       val <- pLit <|> pVarVal
       return $ complement <$> val
 
-    pLit = pure <$> num
+    pLit = (pure <$> num) <|> pVarVal
 
 solve1 :: [String] -> Maybe Int
 solve1 = fmap ( flip evalState mempty
@@ -53,5 +53,6 @@ solve1 = fmap ( flip evalState mempty
 main :: IO  ()
 main = do
   instrs <- lines <$> readFile "input.txt"
-  print $ and $ map (isJust . runParser parseLine ) instrs
+  let bad =  filter (not . snd) $ map (fmap (isJust . runParser parseLine) )  $ zip [0..] instrs
+  print $ map ((instrs !!) . fst ) bad
   print $ solve1 instrs
