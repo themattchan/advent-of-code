@@ -32,7 +32,6 @@ import Data.List
 import Data.Ord (comparing)
 import Text.Printf
 import System.CPUTime
-import qualified Numeric
 
 --------------------------------------------------------------------------------
 -- * Algebra
