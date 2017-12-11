@@ -3,15 +3,7 @@ import Utils
 import Data.Semigroup (Max(..))
 
 data Dir = N | NE | SE | S | SW | NW
-  deriving (Show, Ord, Eq)
-
-instance Read Dir where
-  readsPrec _ ('n':'e':xs) = [(NE,xs)]
-  readsPrec _ ('s':'e':xs) = [(SE,xs)]
-  readsPrec _ ('s':'w':xs) = [(SW,xs)]
-  readsPrec _ ('n':'w':xs) = [(NW,xs)]
-  readsPrec _ ('n'    :xs) = [(N,xs)]
-  readsPrec _ ('s'    :xs) = [(S,xs)]
+  deriving (Show, Read, Ord, Eq)
 
 -- http://catlikecoding.com/unity/tutorials/hex-map/part-1/
 type HexCoord = (Sum Int, Sum Int)
@@ -37,6 +29,6 @@ solve2 = bimap getDist getMax . foldl go (mempty, mempty)
                       in (x, m <> Max (getDist x))
 
 main = do
-  ds <- readFile "input.txt"
+  ds <- map toUpper <$> readFile "input.txt"
   let dirs = read $ "[" ++ ds ++ "]"
   print (solve2 dirs)
