@@ -35,7 +35,7 @@ parseLine = do
     return (out, gate)
   where
     pVar = alpha
-    pInput = (Right <$> num) <|> (Left <$>pVar)
+    pInput = (Right <$> num) <|> (Left <$> pVar)
 
     pOp :: Parser (Int -> Int -> Int)
     pOp =  literal "AND"     (.&.)
@@ -69,7 +69,6 @@ solve ss = (part1, part2)
     go c = runCircuit c M.! "a"
     part1 = go circuit
     part2 = go (M.insert "b" (Pure (Right part1)) circuit)
-
 
 main :: IO  ()
 main = readFile "input.txt" >>= print . solve . lines
