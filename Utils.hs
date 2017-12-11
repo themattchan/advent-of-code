@@ -7,6 +7,7 @@ module Utils
   , module Data.Bifunctor
   , module Data.Bool
   , module Data.Char
+  , module Data.Either
   , module Data.Function
   , module Data.Foldable
 --  , module Data.Semigroup
@@ -24,6 +25,7 @@ import Data.Bits
 import Data.Bifunctor
 import Data.Bool (bool)
 import Data.Char
+import Data.Either
 import Data.Function (on)
 import Data.Foldable
 --import Data.Semigroup
