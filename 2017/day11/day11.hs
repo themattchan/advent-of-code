@@ -1,5 +1,4 @@
 #! /usr/bin/env runhaskell -i../../
-{-# LANGUAGE LambdaCase, DeriveFunctor, TupleSections #-}
 import Utils
 import Data.Semigroup (Max(..))
 
