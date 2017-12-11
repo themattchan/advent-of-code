@@ -1,8 +1,7 @@
 #! /usr/bin/env runhaskell -i../../
 {-# LANGUAGE LambdaCase, DeriveFunctor, TupleSections #-}
 import Utils
-import qualified Data.List.NonEmpty as NE
-import Data.Semigroup hiding ((<>))
+import Data.Semigroup (Max(..))
 
 data Dir = N | NE | SE | S | SW | NW
   deriving (Show, Ord, Eq)
@@ -32,21 +31,13 @@ toCoord NW = mkCoord (-1) 1
 getDist (Sum x, Sum z) = maximum [abs x, abs y, abs z]
   where y = (-x) + (-z)
 
--- solve1 :: [Dir] -> Int
--- solve1 = getDist . foldMap toCoord
-
 solve2 :: [Dir] -> (Int, Int)
 solve2 = bimap getDist getMax . foldl go (mempty, mempty)
   where
     go (coord, m) a = let x = coord <> toCoord a
                       in (x, m <> Max (getDist x))
 
---solve2 = NE.fromList . map toCoord
 main = do
   ds <- readFile "input.txt"
   let dirs = read $ "[" ++ ds ++ "]"
-  -- print $ solve [NE,NE,NE]
-  -- print $ solve [NE,NE,SW,SW]
-  -- print $ solve [NE,NE,S,S]
-  -- print $ solve [SE,SW,SE,SW,SW]
   print (solve2 dirs)
