@@ -16,17 +16,16 @@ type Circuit = M.Map String (Gate Input)
 type Result = M.Map String Int
 
 runCircuit :: Circuit -> Result
-runCircuit c = r
+runCircuit circuit = result
   where
-    resolve (Left v)  = r M.! v
+    result = fmap (evalGate . fmap resolve) circuit
+
+    resolve (Left v)  = result M.! v
     resolve (Right n) = n
 
-    evalGate :: Gate Int -> Int
     evalGate (Pure x)       = x
     evalGate (Unop op x)    = op x
     evalGate (Binop op x y) = op x y
-
-    r = fmap (evalGate . fmap resolve) c
 
 parseLine :: Parser (String, Gate Input)
 parseLine = do
