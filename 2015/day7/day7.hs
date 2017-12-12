@@ -3,7 +3,7 @@
 import Utils
 import Data.Functor.Compose
 import Data.Bits
-import qualified Data.Map as M
+import qualified Data.Map.Lazy as M
 
 type Input = Either String Int
 
