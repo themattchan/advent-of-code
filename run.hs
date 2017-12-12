@@ -9,7 +9,6 @@ import Data.Time
 import Data.Text (unpack)
 
 type Puzzle = (FilePath, FilePath)
-  -- Dir,
 
 data Runner = New Puzzle | Run Puzzle | Compile Puzzle
 
@@ -20,8 +19,9 @@ parseOpts year
  <|> Compile <$> subcommand "compile" "Compile puzzle" parsePuzzle
   where
     yearDesc = fromString $ "The year (default: "++show year++")"
-    parsePuzzle = puzzlePath <$> (optInt "year" 'y' yearDesc <|> pure year)
-                             <*> argInt "day" "The day"
+    parsePuzzle = puzzlePath year
+                  <$> (optInt "year" 'y' yearDesc <|> pure year)
+                  <*> argInt "day" "The day"
 
 boilerplate :: [Line]
 boilerplate =
@@ -32,11 +32,14 @@ boilerplate =
 fpath :: Text -> FilePath
 fpath = fromString . unpack
 
-puzzlePath :: Int -> Int -> Puzzle
-puzzlePath yr day =
-  let dir  = fpath $ format (d%"/day"%d) yr day
-      file = fpath $ format ("day"%d%".hs") day
-  in (dir, file)
+puzzlePath :: Int -> Int -> Int -> Puzzle
+puzzlePath maxYr yr day
+  | not $ 2015 <= yr  && yr  <= maxYr = error $ "Invalid year: " ++ show yr
+  | not $ 1    <= day && day <= 25    = error $ "Invalid day: " ++ show day
+  | otherwise =
+    let dir  = fpath $ format (d%"/day"%d) yr day
+        file = fpath $ format ("day"%d%".hs") day
+    in (dir, file)
 
 main :: IO ()
 main = do
