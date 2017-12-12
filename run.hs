@@ -13,14 +13,14 @@ type Puzzle = (FilePath, FilePath)
 
 data Runner = New Puzzle | Run Puzzle | Compile Puzzle
 
-parseOpts :: Integer -> Parser Runner
+parseOpts :: Int -> Parser Runner
 parseOpts year
   =  New     <$> subcommand "new" "Make a new puzzle"  parsePuzzle
  <|> Run     <$> subcommand "run" "Run puzzle in ghci" parsePuzzle
  <|> Compile <$> subcommand "compile" "Compile puzzle" parsePuzzle
   where
-    -- TODO make year actually optional
-    parsePuzzle = puzzlePath <$> optInt "year" 'y' (fromString $ "The year (default: "++show year++")")
+    yearDesc = fromString $ "The year (default: "++show year++")"
+    parsePuzzle = puzzlePath <$> (optInt "year" 'y' yearDesc <|> pure year)
                              <*> argInt "day" "The day"
 
 boilerplate :: [Line]
@@ -41,7 +41,7 @@ puzzlePath yr day =
 main :: IO ()
 main = do
   (y,m,d) <- toGregorian . utctDay <$> date
-  runner <- options "Advent of Code" (parseOpts y)
+  runner <- options "Advent of Code" (parseOpts (fromIntegral y))
   cwd <- pwd
   case runner of
     New (dir, file) -> do
