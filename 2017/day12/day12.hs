@@ -14,9 +14,9 @@ sizeOfScc :: SCC a -> Int
 sizeOfScc = length . flattenSCC
 
 findScc :: Int -> [SCC Int] -> Maybe (SCC Int)
-findScc i sccs = headMay [ scc | scc <- sccs, i `elem` flattenSCC scc]
+findScc i = headMay . filter (elem i . flattenSCC)
 
-solve :: String -> (Int, Int)
+solve :: String -> Maybe (Int, Int)
 solve ss = do
   graph <- runParser readGraph ss
   let sccs = stronglyConnComp graph
