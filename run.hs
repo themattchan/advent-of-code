@@ -3,6 +3,7 @@
 
 {-# LANGUAGE OverloadedStrings, ExistentialQuantification, Rank2Types #-}
 
+import Utils hiding (Parser(..))
 import Prelude hiding (FilePath)
 import Turtle
 import Data.Time
