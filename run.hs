@@ -49,6 +49,7 @@ main = do
   case runner of
     New (dir, file) -> do
       mkdir dir
+      cd dir
       touch file
       mapM_ (append file . pure) boilerplate
       void $ chmod executable file
