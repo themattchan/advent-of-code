@@ -9,10 +9,13 @@ import Turtle
 import Data.Time
 import Data.Text (unpack)
 
+type Year = Int
+type Day  = Int
+
 type Puzzle = (FilePath, FilePath)
 type PuzzleCommand = Puzzle -> (forall io. MonadIO io => io ())
 
-parseOpts :: MonadIO io => Int -> Parser (io ())
+parseOpts :: MonadIO io => Year -> Parser (io ())
 parseOpts year
   =  newPuzzle
          <$> subcommand "new" "Make a new puzzle"  parsePuzzle
@@ -29,7 +32,7 @@ parseOpts year
 fpath :: Text -> FilePath
 fpath = fromString . unpack
 
-puzzlePath :: Int -> Int -> Int -> Puzzle
+puzzlePath :: Year -> Year -> Day -> Puzzle
 puzzlePath maxYr yr day
   | not $ 2015 <= yr  && yr  <= maxYr = error $ "Invalid year: " ++ show yr
   | not $ 1    <= day && day <= 25    = error $ "Invalid day: " ++ show day
