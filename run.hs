@@ -10,7 +10,7 @@ import Data.Time
 import Data.Text (unpack)
 
 type Puzzle = (FilePath, FilePath)
-type PuzzleCommand = forall io. MonadIO io => Puzzle -> io ()
+type PuzzleCommand = Puzzle -> (forall io. MonadIO io => io ())
 
 parseOpts :: MonadIO io => Int -> Parser (io ())
 parseOpts year
