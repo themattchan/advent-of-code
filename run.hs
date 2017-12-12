@@ -43,7 +43,6 @@ main = do
   (y,m,d) <- toGregorian . utctDay <$> date
   let y' = if m < 12 then y-1 else y -- not christmas yet!
   runner <- options "Advent of Code" (parseOpts (fromIntegral y'))
-  cwd <- pwd
   case runner of
     New (dir, file) -> do
       mkdir dir
