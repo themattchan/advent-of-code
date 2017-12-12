@@ -23,12 +23,6 @@ parseOpts year
                   <$> (optInt "year" 'y' yearDesc <|> pure year)
                   <*> argInt "day" "The day"
 
-boilerplate :: [Line]
-boilerplate =
-  ["#! /usr/bin/env runhaskell -i../../"
-  , "import Utils"
-  ]
-
 fpath :: Text -> FilePath
 fpath = fromString . unpack
 
@@ -49,10 +43,7 @@ main = do
   case runner of
     New (dir, file) -> do
       mkdir dir
-      cd dir
-      touch file
-      mapM_ (append file . pure) boilerplate
-      void $ chmod executable file
+      cp "boilerplate.hs" (dir</>file)
 
     Run (dir, file) -> do
       cd dir
