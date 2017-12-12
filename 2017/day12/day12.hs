@@ -13,7 +13,7 @@ readGraph = many $ do
 sizeOfScc :: SCC a -> Int
 sizeOfScc = length . flattenSCC
 
-findScc :: Int -> [SCC Int] -> Maybe (SCC Int)
+findScc :: Eq a =>a -> [SCC a] -> Maybe (SCC a)
 findScc i = headMay . filter (elem i . flattenSCC)
 
 solve :: String -> Maybe (Int, Int)
