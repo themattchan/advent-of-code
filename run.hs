@@ -41,7 +41,8 @@ puzzlePath yr day =
 main :: IO ()
 main = do
   (y,m,d) <- toGregorian . utctDay <$> date
-  runner <- options "Advent of Code" (parseOpts (fromIntegral y))
+  let y' = if m < 12 then y-1 else y -- not christmas yet!
+  runner <- options "Advent of Code" (parseOpts (fromIntegral y'))
   cwd <- pwd
   case runner of
     New (dir, file) -> do
