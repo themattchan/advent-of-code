@@ -21,8 +21,8 @@ solve :: String -> (Int, Int)
 solve ss = do
   graph <- runParser readGraph ss
   let sccs = stronglyConnComp graph
-  scc <- findScc 0 sccs
-  return (sizeOfScc scc, length sccs)
+  scc0 <- findScc 0 sccs
+  return (sizeOfScc scc0, length sccs)
 
 main :: IO ()
 main = readFile "input.txt" >>= print . solve
