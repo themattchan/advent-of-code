@@ -1,4 +1,4 @@
-#! /usr/bin/env runhaskell -i../
+#! /usr/bin/env runhaskell -i../../
 import Utils
 import qualified Data.Set as S
 
