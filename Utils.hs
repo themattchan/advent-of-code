@@ -55,6 +55,10 @@ assocl ~(a, (b, c)) = ((a, b), c)
 assocr :: ((a, b), c) -> (a, (b, c))
 assocr ~((a, b), c) = (a, (b, c))
 
+headMay :: [a] -> Maybe a
+headMay [] = Nothing
+headMay (x:_) = Just x
+
 --------------------------------------------------------------------------------
 -- * Parser combinators
 
