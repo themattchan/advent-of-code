@@ -1,5 +1,4 @@
 #! /usr/bin/env runhaskell -i../../
-{-# LANGUAGE LambdaCase, BangPatterns #-}
 import Utils
 import Data.Graph
 
