@@ -175,7 +175,25 @@ after how many STEPs will PATH(conf) have all nonzero components?
 
 let PATH(conf) = (l:0, d:3, 0), (1, d:4, 1), (2, d:5, 2)
 
-look in quotient groups
+look in quotient groups?
+
+you have congruences:
+
+round = 0
+
+let n = 0
+
+0  mod d0 = r0
+=> r0 = (0 + round) + d0 * k where k in Z => will hit 0 in d0 - 0 rounds
+=> zero when rounds = d0 * n
+
+1  mod d1 = r1
+=> r1 = (1 + round) + d1 * k where k in Z => will hit 0 in d1 - 1 rounds
+=> zero when rounds = d1 * n + (d1-1)
+
+2  mod d3 = r2
+...
+ln mod dn = rn
 
 
 
