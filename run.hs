@@ -6,7 +6,7 @@
 import Utils hiding (Parser(..))
 import Prelude hiding (FilePath)
 import Turtle
-import Data.Time
+import Data.Time (toGregorian, utctDay)
 import Data.Text (unpack)
 
 type Year = Int
