@@ -82,5 +82,40 @@ main = do
 
 --------------------------------------------------------------------------------
 
+{-
 -- there is an analytic solution to part 2!!!
 -- some number theoretic thing to do with common factors...
+-- level : depth
+
+
+Group: for depth n, define
+G_n = {0..2n-1}. this is the same as Z_2n-1 with the additional constraint that
+elements be interpreted in congruence class defined by (e - n).
+
+in other words, the a scanner of depth d is characterised by the group
+
+  S_d = Z_{2n-1} / phi
+    where
+      phi : Z_{2n-1} -> Z_n
+      phi(e) = (e - n)_n.
+
+
+levels: the number of "shifts" to 0 we need to add.
+
+eg. if level = 4 and depth = 5, then this scanner starts at 4.
+
+the entire state of the system { (0,d0), (1,d1) ...}
+where each pair is (level, depth) is given by:
+
+INIT = { 0 in S_d0, (0 + 1) in S_d1, (0+1+1) in S_d2 ... }
+
+we take this sequence to be an element of the direct product:
+
+S_DAll = S_d0 x S_d1 x S_d2 ....
+
+find the number of 1's (in S_DAll) to add to INIT such that
+all of the components are not in the congruence class of which
+(0 in Z_2n-1, for n of the respective component) is a representative.
+
+
+-}
