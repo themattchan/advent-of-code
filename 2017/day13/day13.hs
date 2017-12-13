@@ -4,24 +4,19 @@ import Utils
 import Debug.Trace
 import Data.Semigroup (stimes)
 
-data Dir = UP | DOWN deriving Show
-
-newtype Scanner = Scanner (Int, (Int, Dir))  deriving Show
-
 type FirewallState = [(Int, Maybe Scanner)]
-type PacketPath = [(Int, Maybe Scanner)]
-                -- same thing, it's a diagonal in a
-                -- matrix where rows are FirewallState's
+type PacketPath    = [(Int, Maybe Scanner)]
+  -- same thing, it's a major diagonal in a
+  -- matrix where rows are time-stepped FirewallState's
+
+data Dir = UP | DOWN deriving Show
+newtype Scanner = Scanner (Int, Int, Dir)  deriving Show
 
 stepScanner :: Scanner -> Scanner
--- stepScanner (Scanner (i,j,d)) = Scanner (j'' mod, j'',d)
---   where
---     j' = j+1 `mod` (2*d -2)
---     j'' | j' == d = j'+1
---         | otherwise = j'
-
-stepScanner (Scanner (i, d, UP))   = Scanner (i+1, d, if (i+1) == d-1 then DOWN else UP)
-stepScanner (Scanner (i, d, DOWN)) = Scanner (i-1, d, if (i-1) == 0 then UP else DOWN)
+stepScanner (Scanner (i, d, UP))
+  = Scanner (i+1, d, if (i+1) == d-1 then DOWN else UP)
+stepScanner (Scanner (i, d, DOWN))
+  = Scanner (i-1, d, if (i-1) == 0 then UP else DOWN)
 
 stepScannerMany :: Int -> Scanner -> Scanner
 stepScannerMany n = appEndo (stimes n (Endo stepScanner))
@@ -67,7 +62,6 @@ generate = initScanner 0
       | [l,d] <- words xs = (read (init l), read d)
       | otherwise         = error "BOOM"
 
-    -- returns max index as well as a filled list
     initScanner n [] = []
     initScanner n ((l,d):xs)
       | n == l    = ((l, Just (Scanner (0, (d, UP)))) :)
