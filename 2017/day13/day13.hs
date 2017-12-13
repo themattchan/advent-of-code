@@ -2,50 +2,64 @@
 {-# LANGUAGE TupleSections, LambdaCase, PatternGuards, BangPatterns, DeriveFunctor #-}
 import Utils
 import Debug.Trace
+import Data.Semigroup (stimes)
 
 data Dir = UP | DOWN deriving Show
 
-newtype Scanner = Scanner (Int, Int, Dir)  deriving Show
+newtype Scanner = Scanner (Int, (Int, Dir))  deriving Show
+
 type FirewallState = [(Int, Maybe Scanner)]
 type PacketPath = [(Int, Maybe Scanner)]
                 -- same thing, it's a diagonal in a
                 -- matrix where rows are FirewallState's
 
 stepScanner :: Scanner -> Scanner
+-- stepScanner (Scanner (i,j,d)) = Scanner (j'' mod, j'',d)
+--   where
+--     j' = j+1 `mod` (2*d -2)
+--     j'' | j' == d = j'+1
+--         | otherwise = j'
+
 stepScanner (Scanner (i, d, UP))   = Scanner (i+1, d, if (i+1) == d-1 then DOWN else UP)
 stepScanner (Scanner (i, d, DOWN)) = Scanner (i-1, d, if (i-1) == 0 then UP else DOWN)
 
+stepScannerMany :: Int -> Scanner -> Scanner
+stepScannerMany n = appEndo (stimes n (Endo stepScanner))
+
+stepFirewall :: FirewallState -> FirewallState
 stepFirewall = fmap (fmap (fmap stepScanner))
 
+stepPacketPath :: PacketPath -> PacketPath
+stepPacketPath = stepFirewall
+
+packetPathFromFirewallState :: FirewallState -> PacketPath
+packetPathFromFirewallState st =
+  [ (i, stepScannerMany i <$> scanner) | (i, scanner) <- st ]
+
 solve1 :: String -> Int
-solve1 = part1 . generate
+solve1 = countCaught . packetPathFromFirewallState . generate
   where
-    part1 (n, st) = countCaught $ zipWith (!!) st [0..n]
-
-countCaught :: PacketPath -> Int
-countCaught = sum . map go
-  where
-    go (l, Just (Scanner (0,d,_))) = l*d
-    go _ = 0
-
-isSafe :: PacketPath -> Bool
-isSafe = and . map go
-  where
-    go (_, Just (Scanner (0,_,_))) = False
-    go _ = True
+    countCaught = sum . map go
+      where
+        go (l, Just (Scanner (0,d,_))) = l*d
+        go _ = 0
 
 solve2 :: String -> Int
-solve2 = part2 . generate
+solve2 = fst
+       . head
+       . dropWhile (unsafe . snd)
+       . zip [0..]
+       . iterate stepPacketPath
+       . packetPathFromFirewallState
+       . generate
   where
-    part2 (n,st0) = fst . head . dropWhile (not . snd) $ unfoldr go (0, st0)
+    unsafe = or . map go
       where
-        go (i, st) = Just ((i,countThisOffset st), (i+1, tail st))
+        go (_, Just (Scanner (0,_,_))) = True
+        go _ = False
 
-        countThisOffset = isSafe . flip (zipWith (!!)) [0..n]
-
-generate :: String -> (Int, [FirewallState])
-generate = fmap (iterate stepFirewall)
-         . initScanner 0
+generate :: String -> FirewallState
+generate = initScanner 0
          . map parseScannerDepth
          . lines
   where
@@ -54,12 +68,12 @@ generate = fmap (iterate stepFirewall)
       | otherwise         = error "BOOM"
 
     -- returns max index as well as a filled list
-    initScanner n [] = (n-1,[])
+    initScanner n [] = []
     initScanner n ((l,d):xs)
-      | n == l    = ((l, Just (Scanner (0,d, UP))) :)
-                    <$> initScanner (n+1) xs
+      | n == l    = ((l, Just (Scanner (0, (d, UP)))) :)
+                    $ initScanner (n+1) xs
       | otherwise = ((n, Nothing) :)
-                    <$> initScanner (n+1) ((l,d):xs)
+                    $  initScanner (n+1) ((l,d):xs)
 
 main :: IO ()
 main = do
