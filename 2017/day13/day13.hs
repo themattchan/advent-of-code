@@ -107,8 +107,10 @@ example: when depth = 4, the counter goes:
 
 (0      1      2      3)     4      5      6
 
-see that endpoints are only hit once, while the middle bits are
-notice that 6 = 0, so this is Z_6 if you count the sequence.
+see that endpoints are only hit once, while the middle bits are hit twice during
+a cycle.
+
+this is Z_6.
 
 0,3 are self units
 2,4 are inverses
