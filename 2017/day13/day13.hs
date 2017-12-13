@@ -120,18 +120,16 @@ the depth is Z_n. counter is Z_{ 2n - 2 }.
 
 in other words, the a scanner of depth n is characterised by the group
 
-  S_d = Z_{2n-2} / phi
-    where
-      phi : Z_{2n-2} -> Z_n
-      phi(e) = if e > n then e^-1 else e
+  S_d = Z_{2n-2}
 
-it is obvious that the quotient group Z_{2n-2} is isomorphic to Z_n:
+with positions to be interpreted via the homomorphism: (is this a homomorphism??)
+
+  phi : Z_{2n-2} -> Z_n
+  phi(e) = if e > n then e^-1 else e
+
 when e = 0, e^-1 = 0
 when e = n-1, e^-1 = n-1 (where 2*(n-1) = 2n-2 = 0)
 otherwise, e = x, e^-1 = 2n-2-x. (pairs)
-
-furthermore, Z_n is a normal subgroup of Z_{2n-2}, because Z_{2n-2} is abelian
-and all subgroups of abelian groups are normal.
 
 NB: 1 generates all these groups.
 
