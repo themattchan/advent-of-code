@@ -155,25 +155,19 @@ Let:
    STEP(conf) = conf + GEN
 
 - PATH. At each tick, the packet advances by a level. So it will reach level n
-  by n ticks. Given a configuration CONFIG, we can
+  by n ticks. Given a configuration CONFIG indexed by level, we can find the
+  positions of each scanner by:
+
+   PATH (conf) = { pos + (1 + 1 + ... #level of 1's ) | (level , pos) <- conf }
 
 
--- levels: the number of "shifts" to 0 we need to add.
+PART 1:
 
--- eg. if level = 4 and depth = 5, then this scanner starts at 4.
+\conf -> SUM { level * pos | (level, pos) <- PATH(conf), phi(pos) == 0 }
 
--- the entire state of the system { (0,d0), (1,d1) ...}
--- where each pair is (level, depth) is given by:
+PART 2:
 
--- INIT = { 0 in S_d0, (0 + 1) in S_d1, (0+1+1) in S_d2 ... }
-
--- we take this sequence to be an element of the direct product:
-
--- S_DAll = S_d0 x S_d1 x S_d2 ....
-
--- find the number of 1's (in S_DAll) to add to INIT such that
--- all of the components are not in the congruence class of which
--- (0 in Z_2n-1, for n of the respective component) is a representative.
+use number theory.
 
 
 -}
