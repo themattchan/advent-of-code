@@ -131,7 +131,10 @@ when e = 0, e^-1 = 0
 when e = n-1, e^-1 = n-1 (where 2*(n-1) = 2n-2 = 0)
 otherwise, e = x, e^-1 = 2n-2-x. (pairs)
 
-NB: 1 generates all these groups.
+OBSERVATION.  phi(0) = 0, and phi(e) /= 0 if e /= 0, so we don't
+have to look at elements of Z_{n} to pick out zero: just have to look in group Z_{2n-2}.
+
+OBSERVATION. 1 generates all these groups.
 
 Let:
 
@@ -156,16 +159,23 @@ Let:
   by n ticks. Given a configuration CONFIG indexed by level, we can find the
   positions of each scanner by:
 
-   PATH (conf) = { pos + (1 + 1 + ... #level of 1's ) | (level , pos) <- conf }
+   PATH (conf) = { pos + (1 + 1 + ... #level_n of 1's ) \in Z_{2n-2}
+                 | (level_n , pos) <- conf }
 
 
 PART 1:
 
-\conf -> SUM { level * pos | (level, pos) <- PATH(conf), phi(pos) == 0 }
+\conf -> SUM { level * pos | (level, pos) <- PATH(conf), pos == 0 }
 
 PART 2:
 
-use number theory.
+after how many STEPs will PATH(conf) have all nonzero components?
+
+let PATH(conf) = (l:0, d:3, 0), (1, d:4, 1), (2, d:5, 2)
+
+look in quotient groups
+
+
 
 
 -}
