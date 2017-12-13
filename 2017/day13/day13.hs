@@ -79,3 +79,8 @@ main = do
   input <- readFile "input.txt"
   print . solve1 $ input
   print . solve2 $ input
+
+--------------------------------------------------------------------------------
+
+-- there is an analytic solution to part 2!!!
+-- some number theoretic thing to do with common factors...
