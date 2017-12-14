@@ -6,7 +6,7 @@
 import Utils hiding (Parser(..), fold)
 import Prelude hiding (FilePath)
 import Turtle
-import Data.Bifoldable
+import Data.Bifoldable (bifold)
 import Data.Time (toGregorian, utctDay)
 import Data.Text (unpack, breakOnEnd)
 import qualified Filesystem.Path.CurrentOS
