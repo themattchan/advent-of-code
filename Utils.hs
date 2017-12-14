@@ -143,12 +143,13 @@ myShowHex x = printf "%0*Lx" (finiteBitSize x) x
 myShowBin x = printf "%0*Lb" (finiteBitSize x) x
 
 showHex' :: (Integral a, Show a) => a -> String
-showHex' n = case showHex n "" of
-               [x] -> ['0',x]
-               xs -> xs
+showHex' n = padZero 2 $ showHex n ""
 
-showIntAtBase' :: (Integral a, Show a) => a -> a -> String
-showIntAtBase' b n = showIntAtBase b intToDigit n ""
+showIntAtBase' :: (Integral a, Show a) => Int -> a -> a -> String
+showIntAtBase' w b n = padZero w $ showIntAtBase b intToDigit n ""
+
+padZero :: Int -> String -> String
+padZero w s = replicate (w - length s) '0' ++ s
 
 numbers :: String -> [[Int]]
 numbers = map (map read . words) . lines
