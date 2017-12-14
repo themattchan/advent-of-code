@@ -1,10 +1,17 @@
-#! /usr/bin/env runhaskell -i../../
+-- #! /usr/bin/env runhaskell -i../../
+{-# LANGUAGE CPP #-}
+
+module Day10 (solve1, solve2) where
+
 import Utils
 import Data.Bits (xor)
 import Data.List.Split (chunksOf)
 import Debug.Trace
 import Data.Word
+
+#ifdef DEBUG
 import Control.Exception.Base (assert)
+#endif
 
 type State = ([Int], Int, Int, Int)
   -- ^ list being hashed, length of list, actual index of head, skip size
@@ -37,8 +44,8 @@ hashRound = foldl' go
 sparseHash :: State -> [Int] -> State
 sparseHash st = foldl' hashRound st . replicate 64
 
-denseHash :: State -> String
-denseHash = foldMap (showHex' . foldr1 xor) . chunksOf 16 . finish
+denseHash :: State -> [Int]
+denseHash = map (foldr1 xor) . chunksOf 16 . finish
 
 encodedAscii :: String -> [Int]
 encodedAscii s = map ord (trim s) ++ [17, 31, 73, 47, 23]
@@ -49,10 +56,16 @@ solve1 :: [Int] -> [Int] -> Int
 solve1 xs = product . take 2 . finish . hashRound (initState xs)
 
 solve2 :: String -> String
-solve2 = (\s -> assert (length s == 32) s)
-       . denseHash . sparseHash (initState [0..255])
-       . encodedAscii
+solve2 =
+  #ifdef DEBUG
+  (\s -> assert (length s == 32) s) .
+  #endif
+  foldMap showHex'
+  . denseHash
+  . sparseHash (initState [0..255])
+  . encodedAscii
 
+#ifdef DEBUG
 test = flip assert "TESTS PASSED"
      $ and [ solve1 [0..4] [3,4,1,5] == 12
            , solve2 ""
@@ -64,10 +77,13 @@ test = flip assert "TESTS PASSED"
            , solve2 "1,2,4"
              == "63960835bcdc130f0b66d7ff4f6a5a8e"
            ]
+#endif
 
 main :: IO ()
 main = do
+  #ifdef DEBUG
   putStrLn test
+  #endif
 
   input <- readFile "input.txt"
   let lengths = read $ "[" ++ input ++ "]"
