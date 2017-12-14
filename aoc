@@ -65,7 +65,8 @@ runPuzzle (dir, file) = do
 compilePuzzle :: PuzzleCommand
 compilePuzzle (dir, file) = do
   cd dir
-  stdout (inshell (format ("stack ghc  -- "%fp% "  -O2 -i ../../Utils.hs") $ file) mempty)
+  let ghc = format ("stack ghc  -- "%fp% "  -O2 -i ../../Utils.hs") file
+  stdout (inshell ghc mempty)
 
 main :: IO ()
 main = do
