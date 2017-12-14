@@ -3,11 +3,19 @@
 
 {-# LANGUAGE OverloadedStrings, ExistentialQuantification, Rank2Types #-}
 
-import Utils hiding (Parser(..))
+import Utils hiding (Parser(..), fold)
 import Prelude hiding (FilePath)
 import Turtle
+import Data.Bifoldable
 import Data.Time (toGregorian, utctDay)
-import Data.Text (unpack)
+import Data.Text (unpack, breakOnEnd)
+import qualified Filesystem.Path.CurrentOS
+
+fpathText :: FilePath -> Text
+fpathText = bifold . Filesystem.Path.CurrentOS.toText
+
+fpath :: Text -> FilePath
+fpath = fromString . unpack
 
 type Year = Int
 type Day  = Int
@@ -29,9 +37,6 @@ parseOpts year
                   <$> (optInt "year" 'y' yearDesc <|> pure year)
                   <*> argInt "day" "The day"
 
-fpath :: Text -> FilePath
-fpath = fromString . unpack
-
 puzzlePath :: Year -> Year -> Day -> Puzzle
 puzzlePath maxYr yr day
   | not $ 2015 <= yr  && yr  <= maxYr = error $ "Invalid year: " ++ show yr
@@ -43,8 +48,14 @@ puzzlePath maxYr yr day
 
 newPuzzle :: PuzzleCommand
 newPuzzle (dir, file) = do
+  session <- strict (input "session.txt")
   mkdir dir
   cp "boilerplate.hs" (dir</>file)
+  cd dir
+  let dir' = uncurry (<>) . fmap ("/"<>) . breakOnEnd "/day" . fpathText $ dir
+      url  = format ("http://adventofcode.com/"%s%"/input") dir'
+      curl = format ("curl --cookie \"" %s% "\" "%s) session url
+  output "input.txt" (inshell curl mempty)
 
 runPuzzle :: PuzzleCommand
 runPuzzle (dir, file) = do
