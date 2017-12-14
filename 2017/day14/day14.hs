@@ -44,13 +44,11 @@ solve2 input = length . stronglyConnComp $ defragMap
       , let u = (row, col)
       ]
 
-    neighbours (row, col) = filter validCoord
+    neighbours (row, col) =
       [              (row-1,col)
       , (row, col-1),           (row,col+1)
       ,              (row+1,col)
       ]
-
-    validCoord (r,c) = 0 <= r && r <= 127 && 0 <= c && c <= 127
 
     binaryRow = zip [0..] . expand . KnotHash.solve2 . (input ++) . show
 
