@@ -3,11 +3,9 @@
 -- stack ghc  -- day14.hs  -O2 -i../../:../day10/
 
 {-# LANGUAGE TupleSections, LambdaCase, PatternGuards, BangPatterns, DeriveFunctor #-}
---module Day14 where
 import Utils
 import qualified Day10 as KnotHash
 import Data.Graph
-import Debug.Trace
 
 hexToBin :: Char -> [Int]
 hexToBin = map digitToInt . showIntAtBase' 4 2 . digitToInt
