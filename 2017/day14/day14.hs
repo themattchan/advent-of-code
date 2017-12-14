@@ -7,9 +7,7 @@ DeriveFunctor #-}
 --module Day14 where
 import Utils
 import qualified Day10 as KnotHash
-import qualified Data.Set as S
 import Data.Graph
-
 
 solve1 :: String -> Int
 solve1 input =
@@ -38,18 +36,12 @@ solve1 input =
 solve2 :: String -> Int
 solve2 input = length . stronglyConnComp $ defragMap
   where
-    defrag1Coords =
-      [ (row, col)
+    defragMap =
+      [ (u, u, neighbours u)
       | row <- [0..127]
       , (col, bit) <- binaryRow row
       , bit == 1
-      ]
-
-    defrag1CoordsSet = S.fromList defrag1Coords
-
-    defragMap =
-      [ (u, u, filter (flip S.member defrag1CoordsSet) (neighbours u))
-      | u <- defrag1Coords
+      , let u = (row, col)
       ]
 
     neighbours (row, col) = filter validCoord
