@@ -17,10 +17,10 @@ solve1 :: (w ~ Word64) => w -> w -> w
 solve1 = solve stepA1 stepB1 40000000
 
 solve2 :: (w ~ Word64) => w -> w -> w
-solve2 = solve (until mult4 stepA1) (until mult8 stepB1) 5000000
+solve2 = solve (doUntil mult4 stepA1) (doUntil mult8 stepB1) 5000000
   where
-    until p s !x = let !x' = s x in
-                     if p x' then x' else until p s x'
+    doUntil p s !x = let !x' = s x in
+                       if p x' then x' else doUntil p s x'
 
     mult4 w = (w .&. 0x03) == 0
     mult8 w = (w .&. 0x07) == 0
