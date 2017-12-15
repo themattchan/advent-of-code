@@ -26,16 +26,15 @@ solve2 = solve (until mult4 stepA1) (until mult8 stepB1) 5000000
     mult8 w = (w .&. 0x07) == 0
 
 solve :: (w ~ Word64) => (w -> w) -> (w -> w) -> w -> w -> w -> w
-solve stepA stepB !rounds !seedA !seedB =
-    go rounds 0 seedA seedB
+solve stepA stepB = go 0
   where
-    go !n !sames !x !y
+    go !sames !n !x !y
       | n == 0 = sames
       | otherwise =
         let !x' = stepA x
             !y' = stepB y
             !ss = if ((x' `xor`  y') .&. 0xffff) == 0 then 1 else 0
-        in go (n-1) (sames + ss) x' y'
+        in go (sames + ss) (n-1) x' y'
 
 main :: IO ()
 main = do
