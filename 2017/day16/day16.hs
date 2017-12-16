@@ -23,7 +23,7 @@ replaceAt i e = uncurry (++) . fmap ((e:) . tail) . splitAt i
 solve :: [Move] -> String
 solve = foldl go ['a'..'p'] where
   go st = \case
-      -- list has constant length 15
+      -- list has constant length 16
       Spin i ->
         take 16 . drop (16-(i `mod` 16)) . cycle $ st
       Exchange i j ->
@@ -32,11 +32,6 @@ solve = foldl go ['a'..'p'] where
         xi <- elemIndex x st
         yi <- elemIndex y st
         return $ replaceAt xi y $ replaceAt yi x $ st
-
--- this forms a permutation group
--- the input should be munged into a SINGLE permutation group
--- then apply the group transform a billion times
--- BEFORE calculating anything
 
 -- store the image of [0..n-1] under permutation
 data Permutation = Permutation [Int] deriving Show
