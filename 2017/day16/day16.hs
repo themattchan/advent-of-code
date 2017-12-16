@@ -86,7 +86,7 @@ solve2 = run . mapMaybe (fmap (fmap progToW8) . runParser parseMove)
                    pokeSt xi y
                    pokeSt yi x
 
-           replicateM 1000000000 oneRound
+           replicateM_ 1000000000 oneRound
 
        return $ B.map (+97) $ BI.PS stateFP 0 16
 
