@@ -29,12 +29,12 @@ parseMove = (pS <|> pX <|> pP) <* spaces where
 
 solve :: [String] -> Maybe String
 solve = foldM go ['a'..'p'] where
-  go st c = runParser parseMove c >>= doMove st
-
-doMove st move =
+  go st c = do
+    move <- runParser parseMove c
     case move of
       -- list has constant length 15
-      Spin i -> return . take 16 . drop (16-(i `mod` 16)) . cycle $ st
+      Spin i ->
+        return . take 16 . drop (16-(i `mod` 16)) . cycle $ st
       Exchange i j ->
         return $ replaceAt i (st!!j) $ replaceAt j (st!!i) $ st
       Partner x y -> do
@@ -42,80 +42,57 @@ doMove st move =
         yi <- elemIndex y st
         return $ replaceAt xi y $ replaceAt yi x $ st
 
--- progToInt :: Prog -> Word8
--- progToInt p = fromIntegral $ ord p - 97
--- {-# INLINE progToInt #-}
-
 solve2 :: [String] -> IO B.ByteString
-solve2 moves = do
-  let !moves' = mapMaybe (fmap (fmap (\p -> fromIntegral $ ord p - 97)) . runParser parseMove) moves
+solve2 = run . mapMaybe (fmap (fmap progToW8) . runParser parseMove)
+  where
+    progToW8 p = fromIntegral $ ord p - 97
 
-  state :: Ptr Word8 <- mallocBytes 16
-  tmp :: Ptr Word8 <- mallocBytes 16
+    run moves = do
+       stateFP :: ForeignPtr Word8 <- mallocForeignPtrBytes 16
+       tmpFP   :: ForeignPtr Word8 <- mallocForeignPtrBytes 16
 
-  let peekSt :: Int -> IO Word8
-      peekSt i = peek (state `plusPtr` i)
-      pokeSt :: Int -> Word8 -> IO ()
-      pokeSt i e = poke (state `plusPtr` i) e
+       withForeignPtr stateFP $ \state ->
+         withForeignPtr tmpFP $ \tmp -> do
+           let peekSt :: Int -> IO Word8
+               peekSt i = peek (state `plusPtr` i)
+               pokeSt :: Int -> Word8 -> IO ()
+               pokeSt i e = poke (state `plusPtr` i) e
 
-  forM_ [0..15] $ \offset ->
-    -- store char as numbers: a=0, b=1... etc
-     pokeSt offset (fromIntegral offset)
+           forM_ [0..15] $ \offset ->
+             -- store char as numbers: a=0, b=1... etc
+              pokeSt offset (fromIntegral offset)
 
-  let findIndex c =
-            let go i = do
-                 v <- peekSt i
-                 if v == c then return i else go (i+1)
-            in go 0
+           let findIndex c =
+                 let go i = do
+                      v <- peekSt i
+                      if v == c then return i else go (i+1)
+                 in go 0
 
-  let oneRound = forM moves' $ \move -> do
---x            print move
-            case move of
-              -- list has constant length 15
-              Spin i -> do
-                 copyArray tmp (state `plusPtr` (16-i)) i
-                 moveArray (state `plusPtr` i) state (16-i)
-                 copyArray state tmp i
-                -- end <- peekArray i (state `plusPtr` (16-i))
-                -- beg <- peekArray (16-i) state
-                -- pokeArray state end
-                -- pokeArray (state `plusPtr` i) beg
+           let oneRound = forM moves $ \case
+                 Spin i -> do
+                    copyArray tmp (state `plusPtr` (16-i)) i
+                    moveArray (state `plusPtr` i) state (16-i)
+                    copyArray state tmp i
 
---               return . take 16 . drop (16-(i `mod` 16)) . cycle $ st
-              Exchange i j -> do
-                vi <- peekSt i
-                vj <- peekSt j
-                pokeSt i vj
-                pokeSt j vi
---                return $ replaceAt i (st!!j) $ replaceAt j (st!!i) $ st
-              Partner x y -> do
-                -- let x' = progToInt x
-                -- let y' = progToInt y
-                xi <- findIndex x
-                yi <- findIndex y
-                pokeSt xi y
-                pokeSt yi x
+                 Exchange i j -> do
+                   vi <- peekSt i
+                   vj <- peekSt j
+                   pokeSt i vj
+                   pokeSt j vi
 
-  replicateM 1000000000 oneRound
---  oneRound
-  stateFP <- newForeignPtr_ state
-  return $ B.map (+97) $ BI.PS stateFP 0 16
+                 Partner x y -> do
+                   xi <- findIndex x
+                   yi <- findIndex y
+                   pokeSt xi y
+                   pokeSt yi x
 
-        -- xi <- elemIndex x st
-        -- yi <- elemIndex y st
---        return $ replaceAt xi y $ replaceAt yi x $ st
+           replicateM 1000000000 oneRound
 
-  --     go !n !st
-  --       | n == 0 = st
-  --       | otherwise = traceShow n $  go (n-1) (fromJust (foldM doMove st moves'))
-  -- in do
---    go 1000000000 ['a'..'p']
-
-    -- foldl' (\st ms -> foldl' (\st' m -> st' >>= \s -> doMove s m) st ms )
-    --           (Just ['a'..'p']) (replicate 1000000000 moves')
+       return $ B.map (+97) $ BI.PS stateFP 0 16
 
 main :: IO ()
 main = do
   cs <- splitOn "," <$> readFile "input.txt"
+  print $ length cs
   print $ solve cs
   print =<< solve2 cs
