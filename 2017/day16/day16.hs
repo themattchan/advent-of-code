@@ -51,8 +51,6 @@ solve2 = run . mapMaybe (fmap (fmap progToW8) . runParser parseMove)
        state :: Ptr Word8 <- mallocBytes 16
        tmp   :: Ptr Word8 <- mallocBytes 16
 
-       -- withForeignPtr stateFP $ \state ->
-       --   withForeignPtr tmpFP $ \tmp -> do
        let peekSt :: Int -> IO Word8
            peekSt i = peek (state `plusPtr` i)
            pokeSt :: Int -> Word8 -> IO ()
@@ -68,25 +66,25 @@ solve2 = run . mapMaybe (fmap (fmap progToW8) . runParser parseMove)
                   if v == c then return i else go (i+1)
              in go 0
 
-       let oneRound = for_ moves $ \case
-             Spin i -> do
-               copyArray tmp (state `plusPtr` (16-i)) i
-               moveArray (state `plusPtr` i) state (16-i)
-               copyArray state tmp i
+       replicateM_ 1000000000 $
+         for_ moves $ \case
+           Spin i -> do
+             copyArray tmp (state `plusPtr` (16-i)) i
+             moveArray (state `plusPtr` i) state (16-i)
+             copyArray state tmp i
 
-             Exchange i j -> do
-               vi <- peekSt i
-               vj <- peekSt j
-               pokeSt i vj
-               pokeSt j vi
+           Exchange i j -> do
+             vi <- peekSt i
+             vj <- peekSt j
+             pokeSt i vj
+             pokeSt j vi
 
-             Partner x y -> do
-               xi <- findIndex x
-               yi <- findIndex y
-               pokeSt xi y
-               pokeSt yi x
+           Partner x y -> do
+             xi <- findIndex x
+             yi <- findIndex y
+             pokeSt xi y
+             pokeSt yi x
 
-       replicateM_ 1000000000 oneRound
        stateFP <- newForeignPtr_ state
        return $ B.map (+97) $ BI.PS stateFP 0 16
 
