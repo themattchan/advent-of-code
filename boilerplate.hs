@@ -1,5 +1,9 @@
 #! /usr/bin/env runhaskell -i../../
-{-# LANGUAGE TupleSections, LambdaCase, PatternGuards, BangPatterns, DeriveFunctor #-}
+{-# LANGUAGE BangPatterns  #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE LambdaCase    #-}
+{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE TupleSections #-}
 import Utils
 
 solve :: String -> a
