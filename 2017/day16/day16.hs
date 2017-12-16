@@ -13,9 +13,9 @@ data Move = Spin Int | Exchange Int Int | Partner Char Char
 
 parseMove :: Parser [Move]
 parseMove = sepBy ((pS <|> pX <|> pP) <* spaces) (char ',') where
-  pS = Spin <$> (char 's' *> num)
-  pX = Exchange <$> (char 'x' *> num) <*> (char '/' *> num)
-  pP = Partner <$> (char 'p' *> take1) <*> (char '/' *> take1)
+  pS = Spin     <$> (char 's' *> num)
+  pX = Exchange <$> (char 'x' *> num)   <*> (char '/' *> num)
+  pP = Partner  <$> (char 'p' *> take1) <*> (char '/' *> take1)
 
 replaceAt :: Int -> a -> [a] -> [a]
 replaceAt i e = uncurry (++) . fmap ((e:) . tail) . splitAt i
@@ -27,17 +27,17 @@ solve = foldl go ['a'..'p'] where
       Spin i ->
         take 16 . drop (16-(i `mod` 16)) . cycle $ st
       Exchange i j ->
-        replaceAt i (st!!j) $ replaceAt j (st!!i) $ st
+        replaceAt i (st!!j) . replaceAt j (st!!i) $ st
       Partner x y -> fromJust $ do
         xi <- elemIndex x st
         yi <- elemIndex y st
-        return $ replaceAt xi y $ replaceAt yi x $ st
+        return . replaceAt xi y . replaceAt yi x $ st
 
 -- store the image of [0..n-1] under permutation
 newtype Permutation = Permutation [Int]
 
 instance S.Semigroup Permutation where
-  Permutation p1 <> Permutation p2 = Permutation [p2 !! i | i <- p1]
+  Permutation p1 <> Permutation p2 = Permutation ((p2!!) <$> p1)
 
 solve2 :: [Move] -> String
 solve2 = unPerm . S.stimes 1000000000 . mkPerm . filter notPartner
@@ -47,7 +47,7 @@ solve2 = unPerm . S.stimes 1000000000 . mkPerm . filter notPartner
     notPartner (Partner _ _) = False
     notPartner _ = True
 
-    mkPerm moves = Permutation [ord c - ord 'a'  | c <- solve moves]
+    mkPerm = Permutation . map (subtract (ord 'a') . ord) . solve
 
     unPerm (Permutation out) = [chr (i + ord 'a') | i <- out]
 
