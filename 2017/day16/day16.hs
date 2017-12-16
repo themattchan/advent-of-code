@@ -11,7 +11,8 @@ import Foreign.Marshal.Alloc
 import Foreign.Ptr
 import Foreign.ForeignPtr
 import Foreign.Storable
-import Foreign.Marshal.Array
+--import Foreign.Marshal.Array
+import Foreign.Marshal.Utils
 
 type Prog = Char
 data Move = Spin Int | Exchange Int Int | Partner Prog Prog
@@ -50,6 +51,7 @@ solve2 moves = do
   let !moves' = mapMaybe (runParser parseMove) moves
 
   state :: Ptr Word8 <- mallocBytes 16
+  tmp :: Ptr Word8 <- mallocBytes 16
 
   let peekSt :: Int -> IO Word8
       peekSt i = peek (state `plusPtr` i)
@@ -58,7 +60,7 @@ solve2 moves = do
 
   forM_ [0..15] $ \offset ->
     -- store char as numbers: a=0, b=1... etc
-    pokeSt offset (fromIntegral offset)
+     pokeSt offset (fromIntegral offset)
 
   let findIndex c =
             let go i = do
@@ -67,20 +69,24 @@ solve2 moves = do
             in go 0
 
   let oneRound = forM moves' $ \move -> do
+            print move
             case move of
               -- list has constant length 15
               Spin i -> do
-                 end <- peekArray i (state `plusPtr` (16-i))
-                 beg <- peekArray (16-i) state
-                 pokeArray state end
-                 pokeArray (state `plusPtr` i) beg
+                 copyBytes (state `plusPtr` (16-i)) tmp i
+                 moveBytes state (state `plusPtr` i) (16-i)
+                 copyBytes tmp state i
+--                 end <- peekArray i (state `plusPtr` (16-i))
+--                 beg <- peekArray (16-i) state
+--                 pokeArray state end
+--                 pokeArray (state `plusPtr` i) beg
 
 --               return . take 16 . drop (16-(i `mod` 16)) . cycle $ st
               Exchange i j -> do
                 vi <- peekSt i
                 vj <- peekSt j
                 pokeSt i vj
-                pokeSt j vi
+                pokeSt i vi
 --                return $ replaceAt i (st!!j) $ replaceAt j (st!!i) $ st
               Partner x y -> do
                 let x' = progToInt x
@@ -91,8 +97,9 @@ solve2 moves = do
                 pokeSt yi x'
 
   replicateM 1000000000 oneRound
+--  oneRound
   stateFP <- newForeignPtr_ state
-  return $ BI.PS stateFP 0 16
+  return $ B.map (+97) $ BI.PS stateFP 0 16
 
         -- xi <- elemIndex x st
         -- yi <- elemIndex y st
