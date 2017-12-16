@@ -11,17 +11,17 @@ import Foreign.Marshal.Alloc
 import Foreign.Ptr
 import Foreign.ForeignPtr
 import Foreign.Storable
---import Foreign.Marshal.Array
+import Foreign.Marshal.Array
 import Foreign.Marshal.Utils
 
 type Prog = Char
-data Move = Spin Int | Exchange Int Int | Partner Prog Prog
-  deriving Show
+data Move a = Spin Int | Exchange Int Int | Partner a a
+  deriving (Show, Functor)
 
 replaceAt :: Int -> a -> [a] -> [a]
 replaceAt i e = uncurry (++) . fmap ((e:) . tail) . splitAt i
 
-parseMove :: Parser Move
+parseMove :: Parser (Move Prog)
 parseMove = (pS <|> pX <|> pP) <* spaces where
   pS = Spin <$> (char 's' *> num)
   pX = Exchange <$> (char 'x' *> num) <*> (char '/' *> num)
@@ -42,13 +42,13 @@ doMove st move =
         yi <- elemIndex y st
         return $ replaceAt xi y $ replaceAt yi x $ st
 
-progToInt :: Prog -> Word8
-progToInt p = fromIntegral $ ord p - 97
-{-# INLINE progToInt #-}
+-- progToInt :: Prog -> Word8
+-- progToInt p = fromIntegral $ ord p - 97
+-- {-# INLINE progToInt #-}
 
 solve2 :: [String] -> IO B.ByteString
 solve2 moves = do
-  let !moves' = mapMaybe (runParser parseMove) moves
+  let !moves' = mapMaybe (fmap (fmap (\p -> fromIntegral $ ord p - 97)) . runParser parseMove) moves
 
   state :: Ptr Word8 <- mallocBytes 16
   tmp :: Ptr Word8 <- mallocBytes 16
@@ -69,32 +69,32 @@ solve2 moves = do
             in go 0
 
   let oneRound = forM moves' $ \move -> do
-            print move
+--x            print move
             case move of
               -- list has constant length 15
               Spin i -> do
-                 copyBytes (state `plusPtr` (16-i)) tmp i
-                 moveBytes state (state `plusPtr` i) (16-i)
-                 copyBytes tmp state i
---                 end <- peekArray i (state `plusPtr` (16-i))
---                 beg <- peekArray (16-i) state
---                 pokeArray state end
---                 pokeArray (state `plusPtr` i) beg
+                 copyArray tmp (state `plusPtr` (16-i)) i
+                 moveArray (state `plusPtr` i) state (16-i)
+                 copyArray state tmp i
+                -- end <- peekArray i (state `plusPtr` (16-i))
+                -- beg <- peekArray (16-i) state
+                -- pokeArray state end
+                -- pokeArray (state `plusPtr` i) beg
 
 --               return . take 16 . drop (16-(i `mod` 16)) . cycle $ st
               Exchange i j -> do
                 vi <- peekSt i
                 vj <- peekSt j
                 pokeSt i vj
-                pokeSt i vi
+                pokeSt j vi
 --                return $ replaceAt i (st!!j) $ replaceAt j (st!!i) $ st
               Partner x y -> do
-                let x' = progToInt x
-                let y' = progToInt y
-                xi <- findIndex x'
-                yi <- findIndex y'
-                pokeSt xi y'
-                pokeSt yi x'
+                -- let x' = progToInt x
+                -- let y' = progToInt y
+                xi <- findIndex x
+                yi <- findIndex y
+                pokeSt xi y
+                pokeSt yi x
 
   replicateM 1000000000 oneRound
 --  oneRound
