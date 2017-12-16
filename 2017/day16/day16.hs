@@ -48,51 +48,50 @@ solve2 = run . mapMaybe (fmap (fmap progToW8) . runParser parseMove)
     progToW8 p = fromIntegral $ ord p - 97
 
     run moves = do
-       stateFP :: ForeignPtr Word8 <- mallocForeignPtrBytes 16
-       tmpFP   :: ForeignPtr Word8 <- mallocForeignPtrBytes 16
+       state :: Ptr Word8 <- mallocBytes 16
+       tmp   :: Ptr Word8 <- mallocBytes 16
 
-       withForeignPtr stateFP $ \state ->
-         withForeignPtr tmpFP $ \tmp -> do
-           let peekSt :: Int -> IO Word8
-               peekSt i = peek (state `plusPtr` i)
-               pokeSt :: Int -> Word8 -> IO ()
-               pokeSt i e = poke (state `plusPtr` i) e
+       -- withForeignPtr stateFP $ \state ->
+       --   withForeignPtr tmpFP $ \tmp -> do
+       let peekSt :: Int -> IO Word8
+           peekSt i = peek (state `plusPtr` i)
+           pokeSt :: Int -> Word8 -> IO ()
+           pokeSt i e = poke (state `plusPtr` i) e
 
-           forM_ [0..15] $ \offset ->
-             -- store char as numbers: a=0, b=1... etc
-              pokeSt offset (fromIntegral offset)
+       for_ [0..15] $ \offset ->
+         -- store char as numbers: a=0, b=1... etc
+          pokeSt offset (fromIntegral offset)
 
-           let findIndex c =
-                 let go i = do
-                      v <- peekSt i
-                      if v == c then return i else go (i+1)
-                 in go 0
+       let findIndex c =
+             let go i = do
+                  v <- peekSt i
+                  if v == c then return i else go (i+1)
+             in go 0
 
-           let oneRound = forM moves $ \case
-                 Spin i -> do
-                    copyArray tmp (state `plusPtr` (16-i)) i
-                    moveArray (state `plusPtr` i) state (16-i)
-                    copyArray state tmp i
+       let oneRound = for_ moves $ \case
+             Spin i -> do
+               copyArray tmp (state `plusPtr` (16-i)) i
+               moveArray (state `plusPtr` i) state (16-i)
+               copyArray state tmp i
 
-                 Exchange i j -> do
-                   vi <- peekSt i
-                   vj <- peekSt j
-                   pokeSt i vj
-                   pokeSt j vi
+             Exchange i j -> do
+               vi <- peekSt i
+               vj <- peekSt j
+               pokeSt i vj
+               pokeSt j vi
 
-                 Partner x y -> do
-                   xi <- findIndex x
-                   yi <- findIndex y
-                   pokeSt xi y
-                   pokeSt yi x
+             Partner x y -> do
+               xi <- findIndex x
+               yi <- findIndex y
+               pokeSt xi y
+               pokeSt yi x
 
-           replicateM_ 1000000000 oneRound
-
+       replicateM_ 1000000000 oneRound
+       stateFP <- newForeignPtr_ state
        return $ B.map (+97) $ BI.PS stateFP 0 16
 
 main :: IO ()
 main = do
   cs <- splitOn "," <$> readFile "input.txt"
-  print $ length cs
   print $ solve cs
   print =<< solve2 cs
