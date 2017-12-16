@@ -34,7 +34,7 @@ solve = foldl go ['a'..'p'] where
         return $ replaceAt xi y $ replaceAt yi x $ st
 
 -- store the image of [0..n-1] under permutation
-data Permutation = Permutation [Int] deriving Show
+newtype Permutation = Permutation [Int]
 
 instance S.Semigroup Permutation where
   Permutation p1 <> Permutation p2 = Permutation [p2 !! i | i <- p1]
