@@ -111,12 +111,8 @@ reify z = go (Just z)
         Mul -> go (move 1 z) (M.alter (fmap (* getVal' v st)) r st)
         Mod -> go (move 1 z) (M.alter (fmap (`mod` getVal' v st)) r st)
 
-      Jgz cond off ->
-        let condv = getVal' cond st
-            offv = getVal' off st
-        in if condv > 0
-          then go (move offv z) st
-          else go (move 1 z) st
+      Jgz cond off | getVal' cond st > 0 -> go (move (getVal' off st) z) st
+                   | otherwise           -> go (move 1 z) st
 
 solve2 commands = go zero one [] [] 0
   where
