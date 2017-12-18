@@ -17,7 +17,7 @@ solve n = head . tail . head . drop 2017 $ unfoldr go (1, [0]) where
 -- can never overwrite 0? is 0 always at index 0? proof?
 insertInds n = scanl' go 0 [1..]
   where
-    go prev i = (prev + n) `mod` i + 1
+    go prev i = (prev + n) `mod` i + 1 --- INVARIANT: next "write to" loc. is nonzero.
 
 solve2 = last          -- most recent addition
        . elemIndices 1 -- all i's where you write to index 1
