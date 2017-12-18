@@ -20,19 +20,19 @@ data Command = Snd Value | Op Op Reg Value | Rcv Reg | Jgz Value Value deriving 
 parseCommands :: Parser (Zipper Command)
 parseCommands = zipperFromList <$> many parseOne
   where
-    parseOne = foldl1 (<|>) [pSnd, pSet, pAdd, pMul, pMod, pRcv, pJgz] <* spaces
+    parseOne = foldl1 (<|>)
+      [ do string "snd"; spaces; Snd <$> value
+      , do string "set"; spaces; pOp Set
+      , do string "add"; spaces; pOp Add
+      , do string "mul"; spaces; pOp Mul
+      , do string "mod"; spaces; pOp Mod
+      , do string "rcv"; spaces; Rcv <$> reg
+      , do string "jgz"; spaces; Jgz <$> (value <* spaces) <*> value
+      ] <* spaces
 
     reg = take1
     value = (Val <$> num) <|> (Reg <$> reg)
     pOp op = Op op <$> (reg <* spaces) <*> value
-
-    pSnd = do string "snd"; spaces; Snd <$> value
-    pSet = do string "set"; spaces; pOp Set
-    pAdd = do string "add"; spaces; pOp Add
-    pMul = do string "mul"; spaces; pOp Mul
-    pMod = do string "mod"; spaces; pOp Mod
-    pRcv = do string "rcv"; spaces; Rcv <$> reg
-    pJgz = do string "jgz"; spaces; Jgz <$> (value <* spaces) <*> value
 
 data DuetState = DS
   { registersDS :: M.Map Char Int
@@ -82,9 +82,9 @@ solve1 = fromLeft . evalState (runExceptT run) . DS mempty Nothing
 
       Op op r v -> op & \case
         Set -> getVal v >>= setReg r . fromJust >> nextCommand
-        Add -> (fmap (+) <$> getVal v) >>= modifyReg r >> nextCommand
-        Mul -> (fmap (*) <$> getVal v) >>= modifyReg r >> nextCommand
-        Mod -> (fmap (flip mod) <$> getVal v) >>= modifyReg r >> nextCommand
+        Add -> fmap (+) <$> getVal v >>= modifyReg r >> nextCommand
+        Mul -> fmap (*) <$> getVal v >>= modifyReg r >> nextCommand
+        Mod -> fmap (flip mod) <$> getVal v >>= modifyReg r >> nextCommand
 
       Rcv v -> do
         val <- getVal (Reg v)
