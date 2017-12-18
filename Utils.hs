@@ -109,7 +109,7 @@ sepBy :: Parser a -> Parser b -> Parser [a]
 sepBy p s = many ((p <* s) <|> p)
 
 num :: Parser Int
-num = read <$> some (satisfy isDigit)
+num = read <$> ((++) <$> (string "-" <|> pure "") <*> some (satisfy isDigit))
 
 spaces :: Parser String
 spaces = many (oneof "\t\n ")
