@@ -63,18 +63,17 @@ getVal (Reg c) = gets (M.lookup c . registersDS)
 
 modifyReg :: Reg -> Maybe (Int -> Int) -> Duet ()
 modifyReg r Nothing = pure ()
-modifyReg r (Just f) = do
-  modify (\ds -> ds {registersDS = M.adjust f r (registersDS ds)})
+modifyReg r (Just f) = modify (\ds -> ds {registersDS = M.adjust f r (registersDS ds)})
 
 setReg :: Reg -> Int -> Duet ()
 setReg r i = modify (\ds -> ds {registersDS = M.insert r i (registersDS ds)})
-
-fromLeft (Left x) = x
 
 solve1 :: Zipper Command -> End
 solve1 = fromLeft . evalState (runExceptT run) . DS mempty Nothing
   where
     run = forever $ currCommand >>= interpCommand
+
+    fromLeft (Left x) = x
 
     interpCommand = \case
       Snd v -> getVal v >>= \v' -> modify' (\ds -> ds {lastFreqDS = v' }) >> nextCommand
