@@ -65,7 +65,7 @@ runPuzzle (dir, file) = do
 compilePuzzle :: PuzzleCommand
 compilePuzzle (dir, file) = do
   cd dir
-  let ghc = format ("stack ghc  -- "%fp% " -rtsopts -O2 -i ../../Utils.hs") file
+  let ghc = format ("stack ghc  -- "%fp% " -rtsopts -O2 -i ../../Utils.hs -i ../../Zipper.hs") file
   stdout (inshell ghc mempty)
 
 main :: IO ()

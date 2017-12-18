@@ -26,7 +26,7 @@ import Data.Bifunctor
 import Data.Bool (bool)
 import Data.Char
 import Data.Either
-import Data.Function (on)
+import Data.Function (on, (&))
 import Data.Foldable
 --import Data.Semigroup
 import Data.Tuple (swap)
