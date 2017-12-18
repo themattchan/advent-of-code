@@ -52,10 +52,6 @@ sides n = take 4 $ unfoldr go indexes
 corners :: Int -> [Int]
 corners = map head . sides
 
-window :: Int -> [a] -> [[a]]
-window n xs = take (length xs - n + 1)
-            $ unfoldr (Just . (take n &&& tail)) (cycle xs)
-
 -- (indicies of) neighbours of (indicies of) this ring in previous ring.
 prevNeighbours :: Int -> [(Int, [Int])]
 prevNeighbours n = concatMap (tail . go) ns

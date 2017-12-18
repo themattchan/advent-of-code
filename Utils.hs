@@ -59,6 +59,10 @@ headMay :: [a] -> Maybe a
 headMay [] = Nothing
 headMay (x:_) = Just x
 
+window :: Int -> [a] -> [[a]]
+window n xs = take (length xs - n + 1)
+            $ unfoldr (Just . (take n &&& tail)) (cycle xs)
+
 --------------------------------------------------------------------------------
 -- * Parser combinators
 
