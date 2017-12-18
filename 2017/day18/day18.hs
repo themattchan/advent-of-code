@@ -42,32 +42,31 @@ data DuetState = DS
 
 data End = Recovered Int | FinishedCommands deriving Show
 
-type DuetT m a = ExceptT End ((StateT DuetState) m) a
-type Duet a = DuetT Identity a
+type Duet a = ExceptT End (State DuetState) a
 
-currCommand :: Monad m => DuetT m Command
+currCommand :: Duet Command
 currCommand = gets (viewFoci . commandsDS)
 
-moveCommand :: Monad m => Int -> DuetT m ()
+moveCommand :: Int -> Duet ()
 moveCommand n = do
   z <- gets commandsDS
   case move n z of
     Nothing -> throwError FinishedCommands
     Just z' -> modify (\ds -> ds { commandsDS = z' })
 
-nextCommand :: Monad m => DuetT m ()
+nextCommand :: Duet ()
 nextCommand = moveCommand 1
 
-getVal :: Monad m => Value -> DuetT m (Maybe Int)
+getVal :: Value -> Duet (Maybe Int)
 getVal (Val n) = pure (Just n)
 getVal (Reg c) = gets (M.lookup c . registersDS)
 
-modifyReg :: Monad m => Reg -> Maybe (Int -> Int) -> DuetT m ()
+modifyReg :: Reg -> Maybe (Int -> Int) -> Duet ()
 modifyReg r Nothing = pure ()
 modifyReg r (Just f) = do
   modify (\ds -> ds {registersDS = M.adjust f r (registersDS ds)})
 
-setReg :: Monad m => Reg -> Int -> DuetT m ()
+setReg :: Reg -> Int -> Duet ()
 setReg r i = modify (\ds -> ds {registersDS = M.insert r i (registersDS ds)})
 
 fromLeft (Left x) = x
