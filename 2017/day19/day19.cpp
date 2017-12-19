@@ -13,7 +13,7 @@ using namespace std;
 
 enum Dir { UP, DOWN, LEFT, RIGHT };
 
-bool notspace(char c) { return c != ' ';}
+#define notspace(c) (c != ' ')
 
 int main ()
 {
@@ -64,10 +64,10 @@ int main ()
 
     if (isalpha(c, LOCALE)) {
       SEEN += c;
-      //  steps ++;
 
       dbcout << "SEEN "  <<c << endl;
-      // hack
+
+      // hack so it doesn't count the last space after 'Z'
       if (c == 'Z') break;
     }
 
@@ -103,7 +103,6 @@ int main ()
       }
       }
     }
-    //   steps++;
   }
 
   cout << "part 1 " << SEEN << endl;
