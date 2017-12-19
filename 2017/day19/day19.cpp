@@ -53,14 +53,14 @@ int main ()
     case RIGHT: x++; break;
     }
 
-    if (x < 0 || x > WIDTH || y < 0 || y > HEIGHT) {
+    if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
       dbcout << "DONE " << "x=" <<x << " y=" <<y<<endl;
       break;
     }
     dbcout << "x=" <<x << " y=" <<y<<endl;
 
     char c = MAP[y][x];
-      dbcout << "c is "  <<c << endl;
+    dbcout << "c is "  <<c << endl;
 
     if (isalpha(c, LOCALE)) {
       SEEN += c;
@@ -73,13 +73,7 @@ int main ()
 
     else if (c == '+') {
       switch(d) {
-      case UP: {
-        if (notspace(MAP[y][x-1]))
-          d = LEFT;
-        else if (notspace(MAP[y][x+1]))
-          d = RIGHT;
-        break;
-      }
+      case UP:
       case DOWN: {
         if (notspace(MAP[y][x-1]))
           d = LEFT;
@@ -87,13 +81,7 @@ int main ()
           d = RIGHT;
         break;
       }
-      case LEFT: {
-        if (notspace(MAP[y-1][x]))
-          d = UP;
-        else if (notspace(MAP[y+1][x]))
-          d = DOWN;
-        break;
-      }
+      case LEFT:
       case RIGHT: {
         if (notspace(MAP[y-1][x]))
           d = UP;
