@@ -100,6 +100,9 @@ instance Alternative Parser where
 take1 :: Parser Char
 take1 = Parser $ maybeToList . uncons
 
+takeN :: Int -> Parser String
+takeN = flip replicateM take1
+
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy = flip mfilter take1
 
