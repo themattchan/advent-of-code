@@ -78,9 +78,9 @@ int main ()
 
     // take next step
     switch(d) {
-    case UP: y--; break;
-    case DOWN: y++; break;
-    case LEFT: x--; break;
+    case UP:    y--; break;
+    case DOWN:  y++; break;
+    case LEFT:  x--; break;
     case RIGHT: x++; break;
     }
 
