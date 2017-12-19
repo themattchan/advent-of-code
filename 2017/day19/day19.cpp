@@ -31,10 +31,10 @@ int main ()
 
   // x coordinate (horizontal)
   int x = distance(MAP[0].begin(), find_if_not(MAP[0].begin(), MAP[0].end(), [](char c) {return c == ' ';}));
-
   // y coordinate (vertical)
   int y = 0;
   Dir d = DOWN;
+
   string seen;
   int steps = 0;
 
