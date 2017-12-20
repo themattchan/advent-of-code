@@ -76,10 +76,10 @@ collideUntilDone xs
 
     xs' = map stepParticle . filter (not . (`elem` colls) . particleP) $ xs
 
-    ordered cmp xs = all (/= GT) $ zipWith cmp xs (tail xs)
+    orderedBy cmp xs = all (/= GT) $ zipWith cmp xs (tail xs)
 
-    done = ordered (comparing (distV3 . particleV)) sorted
-        && ordered (comparing (distV3 . particleA)) sorted
+    done = orderedBy (comparing (distV3 . particleV)) sorted
+        && orderedBy (comparing (distV3 . particleA)) sorted
       where
         sorted = sortOn (distV3 . particleP) xs
 
