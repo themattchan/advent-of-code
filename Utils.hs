@@ -55,6 +55,9 @@ assocl ~(a, (b, c)) = ((a, b), c)
 assocr :: ((a, b), c) -> (a, (b, c))
 assocr ~((a, b), c) = (a, (b, c))
 
+square :: (a -> b) -> (a, a) -> (b, b)
+square f (x, y) = (f x, f y)
+
 headMay :: [a] -> Maybe a
 headMay [] = Nothing
 headMay (x:_) = Just x
