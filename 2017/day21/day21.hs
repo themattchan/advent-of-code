@@ -42,9 +42,9 @@ recombine = concatMap (map concat) . map transpose
 solve :: String -> (Int, Int)
 solve s = (count $ go !! 5, count $ go !! 18)
   where
-    go    = iterate (recombine . fmap (fmap f) . splitUp) initialPattern
-    f     = compileRules s
-    count = length . filter (== '#') . concat
+    go     = iterate (recombine . fmap (fmap expand) . splitUp) initialPattern
+    expand = compileRules s
+    count  = length . filter (== '#') . concat
 
 main :: IO ()
 main = readFile "input.txt" >>= print . solve
