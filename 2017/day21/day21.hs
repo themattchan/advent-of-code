@@ -14,7 +14,7 @@ type Pattern = [String]
 compileRules :: String -> (Pattern -> Pattern)
 compileRules = (M.!) . M.unions . foldMap (perms . map (splitOn "/") . splitOn " => ") . lines
   where
-    perms [pat, out] = map (flip M.singleton out) . (rotations <=< flips) $ pat
+    perms [pat, out] = [ M.singleton p out | p <- rotations <=< flips $ pat ]
     perms _          = error "parse error"
 
 flips :: Pattern -> [Pattern]
