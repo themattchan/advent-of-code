@@ -10,17 +10,12 @@ import Data.List.Split
 import qualified Data.Map as M
 
 type Pattern = [String]
-type Patterns = M.Map Pattern Pattern
 
-parsePattern :: String -> Patterns
-parsePattern = toMap . map (splitOn "/") . splitOn " => "
+compileRules :: String -> (Pattern -> Pattern)
+compileRules = (M.!) . M.unions . foldMap (perms . map (splitOn "/") . splitOn " => ") . lines
   where
-    toMap = \case
-      [pat, out] -> M.unions . map (flip M.singleton out) . (rotations <=< flips) $ pat
-      _ -> error "parse error"
-
-readInput :: String -> Patterns
-readInput = foldr (M.union . parsePattern)  mempty . lines
+    perms [pat, out] = map (flip M.singleton out) . (rotations <=< flips) $ pat
+    perms _          = error "parse error"
 
 flips :: Pattern -> [Pattern]
 flips p = [p, reverse p, map reverse p]
@@ -42,13 +37,13 @@ splitUp ps = map (transpose . map (chunksOf n)) . chunksOf n $ ps
       | otherwise = 3
 
 recombine :: [[Pattern]] -> Pattern
-recombine = concatMap (map concat). map transpose
+recombine = concatMap (map concat) . map transpose
 
 solve :: String -> (Int, Int)
 solve s = (count $ go !! 5, count $ go !! 18)
   where
     go    = iterate (recombine . fmap (fmap f) . splitUp) initialPattern
-    f     = (M.!) . readInput $ s
+    f     = compileRules s
     count = length . filter (== '#') . concat
 
 main :: IO ()
