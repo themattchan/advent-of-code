@@ -19,6 +19,13 @@ turnRight x = succ x
 
 data Coord = C {-#UNPACK#-}!Int {-#UNPACK#-}!Int deriving (Show,Ord, Eq)
 
+step :: Coord -> Dir -> Coord
+step (C x y) = \case
+  U -> C x (y+1)
+  L -> C (x-1) y
+  D -> C x (y-1)
+  R -> C (x+1) y
+
 type State grid = (Coord, Dir, grid, Int)
 
 getInfectMoveCount (_,_,_,i) = i
@@ -41,11 +48,7 @@ move1 (c@(C x y), d, g, infect) = (c', d', g', infect')
     infect' | not isInfected = infect + 1
             | otherwise = infect
 
-    c' = d' & \case
-      U -> C x (y+1)
-      L -> C (x-1) y
-      D -> C x (y-1)
-      R -> C (x+1) y
+    c' = step d'
 
 evolve1 :: String -> [State Grid]
 evolve1 = iterate move1 . mkInitState . readInput1
@@ -80,11 +83,7 @@ move2 (c@(C x y), d, g, infect) = (c', d', g', infect')
     infect' | cSt == Just Weakened = infect + 1
             | otherwise = infect
 
-    c' = d' & \case
-      U -> C x (y+1)
-      L -> C (x-1) y
-      D -> C x (y-1)
-      R -> C (x+1) y
+    c' = step d'
 
 evolve2 :: String -> [State Grid2]
 evolve2 = iterate move2 . mkInitState . readInput2
