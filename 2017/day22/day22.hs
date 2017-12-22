@@ -16,9 +16,9 @@ turnLeft x = pred x
 turnRight L = U
 turnRight x = succ x
 
-data Coord = C {-#UNPACK#-}!Int {-#UNPACK#-}!Int deriving (Show,Ord, Eq)
+data Coord = C {-#UNPACK#-}!Int {-#UNPACK#-}!Int deriving (Show, Ord, Eq)
 
-data CoordSt = {- Clean (not in map) | -} Weakened | Infected | Flagged  deriving (Show, Ord, Eq, Enum)
+data CoordSt = {- Clean (not in map) | -} Weakened | Infected | Flagged deriving (Show, Ord, Eq, Enum)
 
 type Grid = M.Map Coord CoordSt
 
@@ -29,12 +29,12 @@ step (C x y) = \case
   D -> C x (y-1)
   R -> C (x+1) y
 
-turnBySt :: Dir -> Maybe CoordSt -> Dir
-turnBySt d = \case
-  Nothing       -> turnLeft d
-  Just Weakened -> d
-  Just Infected -> turnRight d
-  Just Flagged  -> turnRight (turnRight d)
+turnBySt :: Maybe CoordSt -> Dir -> Dir
+turnBySt = \case
+  Nothing       -> turnLeft
+  Just Weakened -> id
+  Just Infected -> turnRight
+  Just Flagged  -> turnRight . turnRight
 
 data State = State {-# UNPACK #-}!Coord !Dir !Grid {-# UNPACK #-}!Int
 
@@ -57,7 +57,7 @@ updateGrid2 c g = case M.lookup c g of
 move :: GridUpdater -> State -> State
 move rule (State c d g infect) = (State c' d' g' (infect + infected))
   where
-    d' = turnBySt d (M.lookup c g)
+    d' = turnBySt (M.lookup c g) d
     (g', infected) = rule c g
     c' = step c d'
 
