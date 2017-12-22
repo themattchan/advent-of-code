@@ -19,6 +19,10 @@ turnRight x = succ x
 
 data Coord = C {-#UNPACK#-}!Int {-#UNPACK#-}!Int deriving (Show,Ord, Eq)
 
+data CoordSt = {- Clean (not in map) | -} Weakened | Infected | Flagged  deriving (Show, Ord, Eq, Enum)
+
+type Grid = M.Map Coord CoordSt
+
 step :: Coord -> Dir -> Coord
 step (C x y) = \case
   U -> C x (y+1)
@@ -26,74 +30,48 @@ step (C x y) = \case
   D -> C x (y-1)
   R -> C (x+1) y
 
-type State grid = (Coord, Dir, grid, Int)
+turnBySt :: Dir -> Maybe CoordSt -> Dir
+turnBySt d = \case
+  Nothing       -> turnLeft d
+  Just Weakened -> d
+  Just Infected -> turnRight d
+  Just Flagged  -> turnRight (turnRight d)
 
-getInfectMoveCount (_,_,_,i) = i
+data State = State {-# UNPACK #-}!Coord !Dir !Grid {-# UNPACK #-}!Int
 
-type Grid = S.Set Coord
+getInfectMoveCount (State _ _ _ i) = i
 
-readInput1 = S.fromList . readInput
+type GridUpdater = Coord -> Grid -> (Grid, Int)
 
-move1 :: State Grid -> State Grid
-move1 (c@(C x y), d, g, infect) = (c', d', g', infect')
-  where
-    isInfected = c `S.member` g
+updateGrid1 :: GridUpdater
+updateGrid1 c g = case M.lookup c g of
+  Just Infected -> (M.delete c g, 0)
+  _             -> (M.insert c Infected g, 1)
 
-    d' | isInfected = turnRight d
-       | otherwise = turnLeft d
+updateGrid2 :: GridUpdater
+updateGrid2 c g = case M.lookup c g of
+  Just Flagged  -> (M.delete c g, 0) -- clean
+  Nothing       -> (M.insert c Weakened g, 0)
+  Just Weakened -> (M.adjust succ c g, 1)
+  _             -> (M.adjust succ c g, 0)
 
-    g' | isInfected = c `S.delete` g
-       | otherwise = c `S.insert` g
-
-    infect' | not isInfected = infect + 1
-            | otherwise = infect
-
-    c' = step d'
-
-evolve1 :: String -> [State Grid]
-evolve1 = iterate move1 . mkInitState . readInput1
-  where
-    mkInitState g = (C 0 0, U, g, 0)
-
---------------------------------------------------------------------------------
-
-data CoordSt = {- Clean (not in map) | -} Weakened | Infected | Flagged  deriving (Show, Ord, Eq, Enum)
-
-type Grid2 = M.Map Coord CoordSt
-
-readInput2 :: String -> Grid2
-readInput2 = M.fromList . flip zip (repeat Infected) . readInput
-
-move2 :: State Grid2 -> State Grid2
-move2 (c@(C x y), d, g, infect) = (c', d', g', infect')
+move :: GridUpdater -> State -> State
+move rule (State c@(C x y) d g infect) = (State c' d' g' (infect + infected))
   where
     cSt = c `M.lookup` g
+    d' = turnBySt d cSt
+    (g', infected) = rule c g
+    c' = step c d'
 
-    d' = case cSt of
-      Nothing -> turnLeft d
-      Just Weakened -> d
-      Just Infected -> turnRight d
-      Just Flagged -> turnRight (turnRight d)
-
-    g' = case cSt of
-      Just Flagged -> M.delete c g -- clean
-      Nothing -> M.insert c Weakened g
-      _ -> M.adjust succ c g
-
-    infect' | cSt == Just Weakened = infect + 1
-            | otherwise = infect
-
-    c' = step d'
-
-evolve2 :: String -> [State Grid2]
-evolve2 = iterate move2 . mkInitState . readInput2
+evolve :: GridUpdater -> String -> [State]
+evolve rule = iterate (move rule) . mkInitState . readInput
   where
-    mkInitState g = (C 0 0, U, g, 0)
+    mkInitState g = State (C 0 0) U g 0
 
 --------------------------------------------------------------------------------
 
-readInput :: String -> [Coord]
-readInput s = [C x y | (y, xs) <- indexed, (x, c) <- xs, c == '#']
+readInput :: String -> Grid
+readInput s = M.fromList [(C x y, Infected) | (y, xs) <- indexed, (x, c) <- xs, c == '#']
   where
     l = lines s
     h = length l
@@ -101,7 +79,7 @@ readInput s = [C x y | (y, xs) <- indexed, (x, c) <- xs, c == '#']
     coords n = let n' = (n-1) `div` 2 in [-n'..n']
     indexed = zip (reverse (coords h)) . map (zip (coords w)) $ l
 
-solve :: Int -> [State g] -> Int
+solve :: Int -> [State] -> Int
 solve n ss = getInfectMoveCount $ ss !! n
 
 test = "..#\n#..\n..."
@@ -111,11 +89,11 @@ main = do
   xs <- readFile "input.txt"
 
   putStrLn $ "PART 1"
-  print $ solve 70    (evolve1 test) == 41
-  print $ solve 10000 (evolve1 test) == 5587
-  print $ solve 10000 (evolve1 xs)
+  timed $ print $ solve 70    (evolve updateGrid1 test) == 41
+  timed $ print $ solve 10000 (evolve updateGrid1 test) == 5587
+  timed $ print $ solve 10000 (evolve updateGrid1 xs)
 
   putStrLn $ "\nPART 2"
-  print $ solve 100      (evolve2 test) == 26
-  print $ solve 10000000 (evolve2 test) == 2511944
-  print $ solve 10000000 (evolve2 xs)
+  timed $ print $ solve 100      (evolve updateGrid2 test) == 26
+  timed $ print $ solve 10000000 (evolve updateGrid2 test) == 2511944
+  timed $ print $ solve 10000000 (evolve updateGrid2 xs)
