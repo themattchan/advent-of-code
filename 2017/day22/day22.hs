@@ -5,7 +5,6 @@
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE TupleSections #-}
 import Utils
-import qualified Data.Set as S
 import qualified Data.Map as M
 
 data Dir = U | R | D | L deriving (Show, Eq, Enum)
@@ -56,10 +55,9 @@ updateGrid2 c g = case M.lookup c g of
   _             -> (M.adjust succ c g, 0)
 
 move :: GridUpdater -> State -> State
-move rule (State c@(C x y) d g infect) = (State c' d' g' (infect + infected))
+move rule (State c d g infect) = (State c' d' g' (infect + infected))
   where
-    cSt = c `M.lookup` g
-    d' = turnBySt d cSt
+    d' = turnBySt d (M.lookup c g)
     (g', infected) = rule c g
     c' = step c d'
 
