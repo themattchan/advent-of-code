@@ -11,6 +11,7 @@
 using namespace std;
 
 #define dbcout if (! debugging) {} else cerr
+bool debugging = false;
 
 enum Dir { UP, RIGHT, DOWN, LEFT };
 Dir operator++(Dir& d)
@@ -71,7 +72,7 @@ int solve1 (Grid GRID, int N)
     if (oldSt == Clean) {
       GRID[xy] = Infected;
       infect++;
-    } else if (oldSt == Infected ) {
+    } else if (oldSt == Infected) {
       GRID.erase(xy);
     }
     turnBySt(oldSt, d);
@@ -113,11 +114,9 @@ int solve2 (Grid GRID, int N)
 
 int main (int argc, char *argv[])
 {
-  bool debugging = false;
-
   Grid GRID;
   {
-    string file(argv[1]);
+    string file(argc > 1 ? argv[1] : "input.txt");
     ifstream input(file);
 
     vector<string> lines;
@@ -138,6 +137,6 @@ int main (int argc, char *argv[])
     }
   }
 
-  cout << solve1(GRID, 10000) <<endl;
-  cout << solve2(GRID, 10000000) <<endl;
+  cout << solve1(GRID, 10000) << endl;
+  cout << solve2(GRID, 10000000) << endl;
 }
