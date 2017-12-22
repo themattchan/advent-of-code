@@ -7,11 +7,21 @@
 #include <string>
 #include <utility>
 #include <ctype.h>
+#include <chrono>
 
 using namespace std;
 
 #define dbcout if (! debugging) {} else cerr
 bool debugging = false;
+
+#define TIMEIT(e) \
+  { \
+    auto start = std::chrono::high_resolution_clock::now(); \
+    e; \
+    auto end = std::chrono::high_resolution_clock::now();\
+    std::chrono::duration<double> elapsed = end-start; \
+    cout << "TIME: " << elapsed.count() << "s\n";  \
+  }
 
 enum Dir { UP, RIGHT, DOWN, LEFT };
 Dir operator++(Dir& d)
@@ -137,6 +147,6 @@ int main (int argc, char *argv[])
     }
   }
 
-  cout << solve1(GRID, 10000) << endl;
-  cout << solve2(GRID, 10000000) << endl;
+  TIMEIT(cout << solve1(GRID, 10000) << endl);
+  TIMEIT(cout << solve2(GRID, 10000000) << endl);
 }
