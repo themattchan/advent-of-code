@@ -26,7 +26,7 @@ gen pairs = go 0 0 0 pairs where
                     match' <- if x == match then [y] else if y == match then [x] else []
                     go match' (size + x + y) (len+1) (delete (x,y) avail)
 
-solve1 = maximumBy (comparing snd)
+solve1 = maximum . map snd
 solve2 = maximum . snd . M.findMax . M.fromList . map (fmap (pure :: a -> [a]))
 
 -- type Path a = [a]
