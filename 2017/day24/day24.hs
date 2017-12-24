@@ -19,7 +19,6 @@ readInput = map (toPair . splitOn "/") . lines
   where
     toPair [x,y] = (,) (read x) (read y)
 
-
 gen pairs = go 0 0 0 pairs where
   go !match !size !len avail =
     (len,size) : do (x,y) <- avail
@@ -27,7 +26,7 @@ gen pairs = go 0 0 0 pairs where
                     go match' (size + x + y) (len+1) (delete (x,y) avail)
 
 solve1 = maximum . map snd
-solve2 = maximum . snd . M.findMax . M.fromList . map (fmap (pure :: a -> [a]))
+solve2 = maximum . snd . M.findMax . M.fromList . map (fmap (:[]))
 
 -- type Path a = [a]
 
