@@ -5,6 +5,7 @@
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+module Day18 where
 import Utils
 import Zipper
 import Control.Monad.State.Lazy
@@ -68,8 +69,10 @@ modifyReg r (Just f) = modify (\ds -> ds {registersDS = M.adjust f r (registersD
 setReg :: Reg -> Int -> Duet ()
 setReg r i = modify (\ds -> ds {registersDS = M.insert r i (registersDS ds)})
 
-solve1 :: Zipper Command -> End
-solve1 = fromLeft . evalState (runExceptT run) . DS mempty Nothing
+solve1 = solve $ DS mempty Nothing
+
+solve :: (Zipper Command -> DuetState) -> Zipper Command -> End
+solve state = fromLeft . evalState (runExceptT run) . state
   where
     run = forever $ currCommand >>= interpCommand
 

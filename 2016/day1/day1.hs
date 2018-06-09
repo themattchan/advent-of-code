@@ -27,7 +27,11 @@ prev e | e == minBound = maxBound
        | otherwise = pred e
 
 data State = State Dir Int Int Int Int
-  deriving (Show, Eq, Ord)
+  deriving (Show, Ord)
+
+instance Eq State where
+  State _ n1 e1 s1 w1 == State _ n2 e2 s2 w2
+   = and $ zipWith (==) [n1,e1,s1,w1] [n2,e2,s2,w2]
 
 initialState = State N 0 0 0 0
 
@@ -44,43 +48,10 @@ distanceMoved (State _ n e s w) = abs (n + e - s - w)
 move :: State -> Mov -> State
 move st (Mov tu n) = step (turn st tu) n
 
-type XY = (Int,Int)
+part2 =  map distanceMoved . scanl move initialState
+  where go (x : xs) = if x `elem` xs then x else go xs
+        go  _ = undefined
 
-toXY (State _ n e s w) = (e-w, n-s)
-
-type Seg = (XY,XY)
-
--- http://bryceboe.com/2006/10/23/line-segment-intersection-algorithm/
--- def ccw(A,B,C):
---     return (C.y-A.y)*(B.x-A.x) > (B.y-A.y)*(C.x-A.x)
--- def intersect(A,B,C,D):
---     return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
-
-ccw :: XY -> XY -> XY -> Bool
-ccw (ax,ay) (bx,by) (cx,cy) = (cy-ay) * (bx-ax) > (by-ay) * (cx-ax)
-
-intersect :: Seg -> Seg -> Bool
-intersect (a,b) (c,d) = (ccw a c d /= ccw b c d) && (ccw a b c /= ccw a b d)
-
-intersects :: Seg -> [Seg] -> Maybe Seg
-intersects s = foldr go Nothing
-  where
-    go Nothing ss | intersects s ss = Just ss
-                  | otherwise = Nothing
-    go j _ = j
-
-part2 (m:movs) = foldl' go ini movs
-  where
-    ini = Left (initialState, toXY initialState, [])
-    go (Left (st, lastSt, segs)) x
-      | Just ss <- intersects newSeg segs
-      = Right
-      | otherwise = Left (st', toXY st, newSeg:segs)
-      where
-        st' = move st x
-        newSeg = (toXY st,lastSt)
-
-    go r _ = r
 
 main :: IO ()
 main = do
@@ -89,4 +60,4 @@ main = do
     Nothing -> error "parse failure"
     Just movs -> do
       print $ distanceMoved (foldl' move initialState movs)
-      print $ distanceMoved (part2 movs)
+      print $ (part2 movs)

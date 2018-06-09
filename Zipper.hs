@@ -25,3 +25,6 @@ modifyFoci f (Zipper (ls, e, rs)) = Zipper (ls, f e, rs)
 zipperFromList :: [a] -> Zipper a
 zipperFromList []     = undefined
 zipperFromList (x:xs) = Zipper ([], x, xs)
+
+unzipper :: Zipper a -> [a]
+unzipper (Zipper (xs,e,ys)) = xs ++ e:ys
