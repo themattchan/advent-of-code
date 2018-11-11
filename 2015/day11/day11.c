@@ -51,6 +51,8 @@ void incrs(char *sbeg, char *send)
 {
 	char* cur = send;
 	*cur = INCR(*cur);
+	/* optimisation: if *cur is IOL after incr, then set everything to the
+	 * right to 'a' */
 	while (*cur == 'a' && cur != sbeg) {
 		cur--;
 		*cur = INCR(*cur);
