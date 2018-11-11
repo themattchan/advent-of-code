@@ -43,7 +43,7 @@ bool twooverlap(char *s)
 
 }
 
-#define INCR(x) (x == 'z' ? 'a' : x+1)
+#define INCR(x) ((x) == 'z' ? 'a' : (x)+1)
 
 void incrs(char *sbeg, char *send)
 {
