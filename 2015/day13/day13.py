@@ -21,14 +21,14 @@ def solve(ks, lookup):
     def solve1(ps):
         xs = it.izip(ps, it.islice(it.cycle(ps), 1, len(ps)+1))
         return sum(it.imap(lambda (x,y): lookup(x,y)+lookup(y,x), xs))
-    return it.imap(solve1, it.permutations(ks))
+    return max(it.imap(solve1, it.permutations(ks)))
 
 if __name__ == "__main__":
     T = parse("test")
-    print max(solve(T.keys(), lambda x,y: T[x][y])) == 330
+    print solve(T.keys(), lambda x,y: T[x][y]) == 330
 
     G = parse("input")
-    print max(solve(G.keys(), lambda x,y: G[x][y]))
+    print solve(G.keys(), lambda x,y: G[x][y])
 
     def part2(x,y):
         if x == 'me' or y == 'me':
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         else:
             return G[x][y]
 
-    print max(solve(G.keys()+['me'], part2))
+    print solve(G.keys()+['me'], part2)
     
         
     
