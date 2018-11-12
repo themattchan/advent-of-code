@@ -1,22 +1,32 @@
+# https://ampl.com/cgi-bin/ampl/amplcgi
+
+# commands:
+#
+# solve;
+# display score;
+#
+
 # ingredients
 set I;
 
-param capacity{c in I};
-param durability{d in I};
-param flavor{f in I};
-param texture{t in I};
-param calories{c in I};
+param capacity{I};
+param durability{I};
+param flavor{I};
+param texture{I};
+param calories{I};
 
 # quantity of each ingredient
-var q{i in I};
+var q{I};
 
-set ps := capacity durability flavor texture calories;
 
 maximize score:
-  product{p in ps} (sum{i in I} p[i]*q[i]);
-
-s.t. (sum{i in I} q[i]) == 100;
-
+    (sum{i in I} (capacity[i]*q[i])) *
+    (sum{i in I} (durability[i]*q[i])) *
+    (sum{i in I} (flavor[i]*q[i])) *
+    (sum{i in I} (texture[i]*q[i]));
+##    (sum{i in I} calories[i]*q[i]) ;
+subject to c1:
+  (sum {i in I} q[i]) = 100;
 
 data;
 
@@ -37,12 +47,12 @@ param durability :=
 param flavor :=
  Sprinkles    -2
  Butterscotch -3
- Chocolate    5 
+ Chocolate    5
  Candy        0
  ;
 param texture :=
- Sprinkles    0 
- Butterscotch 0 
+ Sprinkles    0
+ Butterscotch 0
  Chocolate    -1
  Candy        5
  ;
