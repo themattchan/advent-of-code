@@ -7,7 +7,7 @@ part1() {
 cat input | part1
 
 part2() {
-  jq -f remove_red.jq  | part1
+    jq -f remove_red.jq | part1
 }
 
 cat input | part2
