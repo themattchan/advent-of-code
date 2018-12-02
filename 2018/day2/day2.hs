@@ -8,6 +8,8 @@ solve1 = (*) <$> s2 <*> s3
     s2 = length . filter (f 2)
     s3 = length . filter (f 3)
 
+-- this is not a very good algorithm: the closer to the beginning the differing
+-- character is, the more screwed we are.
 solve2 :: [String] -> Maybe String
 solve2 = fmap (map fst . snd) . find ((==1) . length . fst) . map diff . (zip <*> tail) . sort
   where
