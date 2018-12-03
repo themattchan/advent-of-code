@@ -44,10 +44,10 @@ lookupPointWithKey _ R.Empty = []
 lookupPointWithKey pt t@R.Leaf{}
     | (R.getMBB t) `R.containsMBB` pt = [(R.getMBB t, R.getElem t)]
     | otherwise = []
-lookupPointWithKey mbb t = founds
+lookupPointWithKey pt t = founds
   where
     matches = filter intersectRTree $ R.getChildren t
-    founds = concatMap (lookupPointWithKey mbb) matches
+    founds = concatMap (lookupPointWithKey pt) matches
     intersectRTree x = isJust $ (R.getMBB x) `R.intersectMBB` pt
 
 -- | returns all values, which are located in the given bounding box.
