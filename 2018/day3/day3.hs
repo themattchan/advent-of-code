@@ -37,18 +37,18 @@ readRT file = do
 -- | returns all keys and values, which contain the given point
 lookupPointWithKey :: R.MBB -> R.RTree a -> [(R.MBB, a)]
 lookupPointWithKey _ R.Empty = []
-lookupPointWithKey mbb t@R.Leaf{}
-    | (R.getMBB t) `R.containsMBB` mbb = [(R.getMBB t, R.getElem t)]
+lookupPointWithKey pt t@R.Leaf{}
+    | (R.getMBB t) `R.containsMBB` pt = [(R.getMBB t, R.getElem t)]
     | otherwise = []
 lookupPointWithKey mbb t = founds
-    where
+  where
     matches = filter intersectRTree $ R.getChildren t
     founds = concatMap (lookupPointWithKey mbb) matches
-    intersectRTree x = isJust $ mbb `R.intersectMBB` (R.getMBB x)
+    intersectRTree x = isJust $ (R.getMBB x) `R.intersectMBB` pt
 
 -- | returns all values, which are located in the given bounding box.
 lookupPoint :: R.MBB -> R.RTree a -> [a]
-lookupPoint mbb t = snd <$> (lookupPointWithKey mbb t)
+lookupPoint pt t = snd <$> (lookupPointWithKey pt t)
 
 
 main :: IO ()
