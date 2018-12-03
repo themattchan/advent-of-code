@@ -1,4 +1,4 @@
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE TypeApplications, ViewPatterns #-}
 
 import Utils
 import qualified Data.RTree as R
@@ -10,6 +10,7 @@ import Debug.Trace
 mbbi :: Int -> Int -> Int -> Int -> R.MBB
 mbbi x y x' y' = R.mbb (fromIntegral x) (fromIntegral y) (fromIntegral x') (fromIntegral y')
 
+{-
 parseRT :: Parser (R.RTree [Int])
 parseRT = do
   char '#'
@@ -31,6 +32,16 @@ parseRT = do
   return (R.singleton m [i])
 
 readRT = fmap (fromJust . fmap mconcat . runParser (many parseRT)) . readFile
+
+-}
+
+parseIt = foldMap go . lines
+  where
+    go = toRT . map (read @Int) . words . map clean
+    clean x | x `elem` "#@,:x" = ' '
+            | otherwise = x
+    toRT [i,x,y,w,h] = R.singleton (mbbi x y (x+w) (y+h)) [i]
+    toRT x = error $ "toRT: "<>show x
 
 --
 -- MODIFIED FROM LIBRARY: lookupRangeWithKey, lookupRange
@@ -59,7 +70,7 @@ lookupPoint pt t = snd <$> (lookupPointWithKey pt t)
 
 main :: IO ()
 main = do
-  rt <- readRT "input"
+  rt <- parseIt <$> readFile "input"
 --  print rt
 --  print $ R.keys rt
 --  print $ R.values rt
