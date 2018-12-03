@@ -4,6 +4,6 @@ cabal-version: >= 1.18
 build-type: Simple
 
 executable day3
-    build-depends: base < 4.12, data-r-tree, myutils
+    build-depends: base < 4.12, data-r-tree, myutils, containers
     main-is: day3.hs
     default-language: Haskell2010
