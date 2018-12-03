@@ -30,9 +30,7 @@ parseRT = do
 --  trace ("parsed mbb: "<>show m) $ pure ()
   return (R.singleton m [i])
 
-readRT file = do
-  Just rt <- fmap mconcat . runParser (many parseRT) <$> readFile file
-  return rt
+readRT = fmap (fromJust . fmap mconcat . runParser (many parseRT)) . readFile
 
 --
 -- MODIFIED FROM LIBRARY: lookupRangeWithKey, lookupRange
