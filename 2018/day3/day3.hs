@@ -34,6 +34,10 @@ readRT file = do
   Just rt <- fmap mconcat . runParser (many parseRT) <$> readFile file
   return rt
 
+--
+-- MODIFIED FROM LIBRARY: lookupRangeWithKey, lookupRange
+--
+
 -- | returns all keys and values, which contain the given point
 lookupPointWithKey :: R.MBB -> R.RTree a -> [(R.MBB, a)]
 lookupPointWithKey _ R.Empty = []
@@ -49,6 +53,10 @@ lookupPointWithKey mbb t = founds
 -- | returns all values, which are located in the given bounding box.
 lookupPoint :: R.MBB -> R.RTree a -> [a]
 lookupPoint pt t = snd <$> (lookupPointWithKey pt t)
+
+--
+-- END MODFIED FROM LIBRARY
+--
 
 
 main :: IO ()
