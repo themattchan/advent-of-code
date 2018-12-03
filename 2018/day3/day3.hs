@@ -10,31 +10,7 @@ import Debug.Trace
 mbbi :: Int -> Int -> Int -> Int -> R.MBB
 mbbi x y x' y' = R.mbb (fromIntegral x) (fromIntegral y) (fromIntegral x') (fromIntegral y')
 
-{-
-parseRT :: Parser (R.RTree [Int])
-parseRT = do
-  char '#'
-  i <- num
-  spaces
-  char '@'
-  spaces
-  x <- num
-  char ','
-  y <- num
-  char ':'
-  spaces
-  w <- num
-  char 'x'
-  h <- num
-  spaces
-  let m = (mbbi x y (x+w) (y+h))
---  trace ("parsed mbb: "<>show m) $ pure ()
-  return (R.singleton m [i])
-
-readRT = fmap (fromJust . fmap mconcat . runParser (many parseRT)) . readFile
-
--}
-
+parseIt :: String -> R.RTree [Int]
 parseIt = foldMap go . lines
   where
     go = toRT . map (read @Int) . words . map clean
