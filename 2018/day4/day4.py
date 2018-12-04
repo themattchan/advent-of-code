@@ -31,7 +31,7 @@ def in_range(i,r):
   return (x <= i and y > i)
 
 def range_size(r):
-  (x,y)=r
+  (x,y) = r
   return y-x
 
 def count_in_ranges(rs, i):
@@ -67,12 +67,12 @@ def build_sleepmap(events):
   sleepmap,_ = ft.reduce(go, zip(events, events[1:]), ({}, None))
   return sleepmap
 
-def max_on_dict(getter,m):
-  k = max(m.keys(), key=compose(getter,m.get))
+def max_on_dict(getter, m):
+  k = max(m.keys(), key=compose(getter, m.get))
   return (k, m[k])
 
 def max_dict(m):
-  return max_on_dict(lambda x: x,m)
+  return max_on_dict(lambda x: x, m)
 
 def fmap_dict(f, m):
   return { k: f(v) for k, v in m.items() }
@@ -92,7 +92,7 @@ def part2(sleepmap):
       x = max_dict(fmap_dict(lambda rs: count_in_ranges(dt_ranges_to_min_ranges(rs), i), sleepmap))
       yield (i,x)
 
-  best_min, (best_guard,_) = max_on_dict(snd, dict(go()))
+  best_min, (best_guard, _) = max_on_dict(snd, dict(go()))
 
   return (best_min * best_guard)
 
