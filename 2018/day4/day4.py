@@ -57,12 +57,12 @@ def build_freqs_map(rs):
 def build_sleepmap(events):
   def go(l, r):
     (acc, cg) = l
-    ((d1,e1),(d2,e2)) = r
+    ((d1, e1), (d2, e2)) = r
 
     # update current guard
     cg = e1 if isinstance(e1,int) else cg
-    acc[cg] = acc.get(cg, [])+([(d1,d2)] if (e1 == 'f') else [])
-    return (acc,cg)
+    acc[cg] = acc.get(cg, []) + ([(d1, d2)] if (e1 == 'f') else [])
+    return (acc, cg)
 
   sleepmap,_ = ft.reduce(go, zip(events, events[1:]), ({}, None))
   return sleepmap
@@ -80,8 +80,8 @@ def fmap_dict(f, m):
 ################################################################################
 
 def part1(sleepmap):
-  sleepy_guard = fst(max_on_dict(lambda rs: sum_ranges(rs, dt.timedelta()), sleepmap))
-  best_time = fst(max_dict(build_freqs_map(sleepmap[sleepy_guard])))
+  sleepy_guard, sleepy_freqs = max_on_dict(lambda rs: sum_ranges(rs, dt.timedelta()), sleepmap)
+  best_time = fst(max_dict(build_freqs_map(sleepy_freqs)))
   return (best_time * sleepy_guard)
 
 def part2(sleepmap):
