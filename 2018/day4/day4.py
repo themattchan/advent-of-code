@@ -71,39 +71,40 @@ def build_sleepmap(events):
   sleepmap,_ = ft.reduce(go, zip(events, events[1:]), ({}, None))
   return sleepmap
 
-def best_pair_getter(getter,m):
+def max_on_dict(getter,m):
   k = max(m.keys(), key=compose(getter,m.get))
   return (k, m[k])
 
-def best_pair(m): return best_pair_getter(lambda x: x,m)
+def max_dict(m):
+  return max_on_dict(lambda x: x,m)
+
+def fmap_dict(f, m):
+  return { k: f(v) for k, v in m.items() }
 
 ################################################################################
 
 def part1(sleepmap):
-  sleepy_guard = max(sleepmap.keys(), key=lambda k: sum_ranges(sleepmap.get(k), dt.timedelta()))
+  sleepy_guard = fst(max_on_dict(lambda rs: sum_ranges(rs, dt.timedelta()), sleepmap))
   # print ('sleepy_guard='+str(sleepy_guard))
   freqs = build_freqs_map(sleepmap[sleepy_guard])
-  best_time = best_pair(freqs)[0]
+  best_time = fst(max_dict(freqs))
 
   return (best_time * sleepy_guard)
 
-def map_values(f, m):
-  return { k: f(v) for k, v in m.items() }
-
 def part2(sleepmap):
-    def go():
-      for i in range(0,60):
-        # for each guard, compute how many times he is asleep in minute i,
-        # and find the guard who sleeps the most in minute i
-        x = best_pair(map_values(lambda rs: count_in_ranges(dt_ranges_to_min_ranges(rs), i), sleepmap))
-        yield (i,x)
+  def go():
+    for i in range(0,60):
+      # for each guard, compute how many times he is asleep in minute i,
+      # and find the guard who sleeps the most in minute i
+      x = max_dict(fmap_dict(lambda rs: count_in_ranges(dt_ranges_to_min_ranges(rs), i), sleepmap))
+      yield (i,x)
 
-    # for all minutes, guard who sleeps the most.
-    best_guards_map = dict(go())
+  # for all minutes, guard who sleeps the most.
+  best_guards_map = dict(go())
 
-    best_min, (best_guard,_) = best_pair_getter(snd, best_guards_map)
+  best_min, (best_guard,_) = max_on_dict(snd, best_guards_map)
 
-    return (best_min * best_guard)
+  return (best_min * best_guard)
 
 sleepmap = build_sleepmap(parse('input.txt'))
 print('part1 = '+str(part1(sleepmap)))
