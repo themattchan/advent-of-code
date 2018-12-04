@@ -74,9 +74,7 @@ def best_pair_getter(getter,m):
   k = max(m.keys(), key=compose(getter,m.get))
   return (k, m[k])
 
-def best_pair(m):
-  k = max(m.keys(), key=m.get)
-  return (k, m[k])
+def best_pair(m): return best_pair_getter(id,m)
 
 ################################################################################
 
