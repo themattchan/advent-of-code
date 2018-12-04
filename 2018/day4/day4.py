@@ -39,6 +39,9 @@ def rangesize(r):
 def count_in_ranges(rs, i):
   return ft.reduce((lambda acc,r: acc + inrange(i,r)), rs, 0)
 
+def sum_ranges(rs, zero):
+  return ft.reduce(lambda acc, r: acc+rangesize(r), rs, zero)
+
 def dt_ranges_to_min_ranges(rs): return list(map(lambda d: (d[0].minute, d[1].minute),rs))
 
 # given a set of ranges, for each min in the hour, count how many times that minute occs in the set
@@ -72,18 +75,13 @@ def best_minute(freqs):
 
 ################################################################################
 
-events = parse('input.txt') # parse('test')
+def part1(sleepmap):
+  sleepy_guard = max(sleepmap.keys(), key=lambda k: sum_ranges(sleepmap.get(k), dt.timedelta()))
+  # print ('sleepy_guard='+str(sleepy_guard))
+  freqs = build_freqs_map(sleepmap[sleepy_guard])
+  bestTime = best_minute(freqs)[0]
 
-sleepmap = build_sleepmap(events)
-sleepyGuard = max(sleepmap.keys(), key=lambda k: ft.reduce(lambda acc, r: acc+rangesize(r), sleepmap.get(k), dt.timedelta()))
-print ('sleepyGuard='+str(sleepyGuard))
-freqs = build_freqs_map(sleepmap[sleepyGuard])
-
-bestTime = best_minute(freqs)[0]
-
-## part 1
-print ('part 1='+str(bestTime * sleepyGuard))
-
+  return (bestTime * sleepy_guard)
 
 def mapValues(f, m):
   return { k: f(v) for k, v in m.items() }
@@ -99,7 +97,7 @@ def part2(sleepmap):
 
         # return him and the number of times he slept
         ret = (i, (y, x[y]))
-        print(ret)
+#        print(ret)
 
         yield ret
 
@@ -107,11 +105,13 @@ def part2(sleepmap):
     best_guards_map = dict(go())
 
     best_min = max(best_guards_map.keys(), key=lambda k: best_guards_map[k][1])
-    print(best_min)
+    # print(best_min)
 
     best_guard = best_guards_map[best_min][0]
-    print(best_guard)
+    # print(best_guard)
 
     return (best_min * best_guard)
 
-print('part2='+str(part2(sleepmap)))
+sleepmap = build_sleepmap(parse('input.txt'))
+print ('part1 = '+str(part1(sleepmap)))
+print('part2 = '+str(part2(sleepmap)))
