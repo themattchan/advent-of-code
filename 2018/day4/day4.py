@@ -86,7 +86,7 @@ def part1(sleepmap):
 
   return (best_time * sleepy_guard)
 
-def mapValues(f, m):
+def map_values(f, m):
   return { k: f(v) for k, v in m.items() }
 
 def part2(sleepmap):
@@ -94,7 +94,7 @@ def part2(sleepmap):
       for i in range(0,60):
         # for each guard, compute how many times he is asleep in minute i,
         # and find the guard who sleeps the most in minute i
-        x = best_pair(mapValues(lambda rs: count_in_ranges(dt_ranges_to_min_ranges(rs), i), sleepmap))
+        x = best_pair(map_values(lambda rs: count_in_ranges(dt_ranges_to_min_ranges(rs), i), sleepmap))
         yield (i,x)
 
     # for all minutes, guard who sleeps the most.
