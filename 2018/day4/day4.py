@@ -5,6 +5,8 @@ import functools as ft
 import operator
 
 def fst(t): return t[0]
+def snd(t): return t[1]
+def compose(g,f): return lambda x: g(f(x))
 
 # type event = 'w' | 'f' | guard-number
 
@@ -68,10 +70,13 @@ def build_sleepmap(events):
   sleepmap,_ = ft.reduce(go, zip(events, events[1:]), ({}, None))
   return sleepmap
 
-# best_minute :: freqs_map -> (int, int)
-def best_minute(freqs):
-  k = max(freqs.keys(), key=freqs.get)
-  return (k, freqs[k])
+def best_pair_getter(getter,m):
+  k = max(m.keys(), key=compose(getter,m.get))
+  return (k, m[k])
+
+def best_pair(m):
+  k = max(m.keys(), key=m.get)
+  return (k, m[k])
 
 ################################################################################
 
@@ -79,9 +84,9 @@ def part1(sleepmap):
   sleepy_guard = max(sleepmap.keys(), key=lambda k: sum_ranges(sleepmap.get(k), dt.timedelta()))
   # print ('sleepy_guard='+str(sleepy_guard))
   freqs = build_freqs_map(sleepmap[sleepy_guard])
-  bestTime = best_minute(freqs)[0]
+  best_time = best_pair(freqs)[0]
 
-  return (bestTime * sleepy_guard)
+  return (best_time * sleepy_guard)
 
 def mapValues(f, m):
   return { k: f(v) for k, v in m.items() }
@@ -89,26 +94,15 @@ def mapValues(f, m):
 def part2(sleepmap):
     def go():
       for i in range(0,60):
-        # for each guard, compute how many times he is asleep in minute i
-        x = mapValues(lambda rs: count_in_ranges(dt_ranges_to_min_ranges(rs), i), sleepmap)
-
-        # find the guard who sleeps the most in minute i
-        y = max(x.keys(), key=x.get)
-
-        # return him and the number of times he slept
-        ret = (i, (y, x[y]))
-#        print(ret)
-
-        yield ret
+        # for each guard, compute how many times he is asleep in minute i,
+        # and find the guard who sleeps the most in minute i
+        x = best_pair(mapValues(lambda rs: count_in_ranges(dt_ranges_to_min_ranges(rs), i), sleepmap))
+        yield (i,x)
 
     # for all minutes, guard who sleeps the most.
     best_guards_map = dict(go())
 
-    best_min = max(best_guards_map.keys(), key=lambda k: best_guards_map[k][1])
-    # print(best_min)
-
-    best_guard = best_guards_map[best_min][0]
-    # print(best_guard)
+    best_min, (best_guard,_) = best_pair_getter(snd, best_guards_map)
 
     return (best_min * best_guard)
 
