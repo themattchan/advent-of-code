@@ -43,6 +43,18 @@ def sum_ranges(rs, zero):
 def dt_ranges_to_min_ranges(rs):
   return list(map(lambda d: (d[0].minute, d[1].minute),rs))
 
+def max_on_dict(getter, m):
+  k = max(m.keys(), key=compose(getter, m.get))
+  return (k, m[k])
+
+def max_dict(m):
+  return max_on_dict(lambda x: x, m)
+
+def fmap_dict(f, m):
+  return { k: f(v) for k, v in m.items() }
+
+################################################################################
+
 # build a map of all guards and their sleeping intervals
 # build_sleepmap :: events -> map guard (list range)
 def build_sleepmap(events):
@@ -57,18 +69,6 @@ def build_sleepmap(events):
 
   sleepmap,_ = ft.reduce(go, zip(events, events[1:]), ({}, None))
   return sleepmap
-
-def max_on_dict(getter, m):
-  k = max(m.keys(), key=compose(getter, m.get))
-  return (k, m[k])
-
-def max_dict(m):
-  return max_on_dict(lambda x: x, m)
-
-def fmap_dict(f, m):
-  return { k: f(v) for k, v in m.items() }
-
-################################################################################
 
 def part1(sleepmap):
   sleepy_guard, sleepy_freqs = max_on_dict(lambda rs: sum_ranges(rs, dt.timedelta()), sleepmap)
