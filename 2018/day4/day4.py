@@ -43,15 +43,6 @@ def sum_ranges(rs, zero):
 def dt_ranges_to_min_ranges(rs):
   return list(map(lambda d: (d[0].minute, d[1].minute),rs))
 
-# given a set of ranges, for each min in the hour, count how many times that minute occs in the set
-# build_freqs_map :: list range[datetime] -> map int int
-def build_freqs_map(rs):
-  rs = dt_ranges_to_min_ranges(rs)
-  def go():
-    for i in range(0,60):
-      yield (i, count_in_ranges(rs,i))
-  return dict(go())
-
 # build a map of all guards and their sleeping intervals
 # build_sleepmap :: events -> map guard (list range)
 def build_sleepmap(events):
@@ -81,7 +72,12 @@ def fmap_dict(f, m):
 
 def part1(sleepmap):
   sleepy_guard, sleepy_freqs = max_on_dict(lambda rs: sum_ranges(rs, dt.timedelta()), sleepmap)
-  best_time = fst(max_dict(build_freqs_map(sleepy_freqs)))
+
+  def go(rs):
+    for i in range(0,60):
+      yield (i, count_in_ranges(rs,i))
+
+  best_time = fst(max_dict(dict(go(dt_ranges_to_min_ranges(sleepy_freqs)))))
   return (best_time * sleepy_guard)
 
 def part2(sleepmap):
