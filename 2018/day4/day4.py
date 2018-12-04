@@ -30,7 +30,7 @@ def splitdt(d):
 # inrange :: int -> range -> bool
 def inrange(i,r):
   (x,y) = r
-  return (x <= i and y >= i)
+  return (x <= i and y > i)
 
 def rangesize(r):
   (x,y)=r
@@ -114,8 +114,4 @@ def part2(sleepmap):
 
     return (best_min * best_guard)
 
-events = parse('input.txt') # parse('test')
-
-sleepmap = build_sleepmap(events)
-
-print(part2(sleepmap))
+print('part2='+str(part2(sleepmap)))
