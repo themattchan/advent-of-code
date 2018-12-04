@@ -37,11 +37,8 @@ def range_size(r):
 def count_in_ranges(rs, i):
   return ft.reduce((lambda acc, r: acc + in_range(i,r)), rs, 0)
 
-def sum_ranges(rs, zero):
-  return ft.reduce(lambda acc, r: acc + range_size(r), rs, zero)
-
-def dt_ranges_to_min_ranges(rs):
-  return list(map(lambda d: (d[0].minute, d[1].minute),rs))
+def sum_ranges(rs):
+  return ft.reduce(lambda acc, r: acc + range_size(r), rs, 0)
 
 def max_on_dict(getter, m):
   k = max(m.keys(), key=compose(getter, m.get))
@@ -64,20 +61,20 @@ def build_sleepmap(events):
 
     # update current guard
     cg = e1 if isinstance(e1,int) else cg
-    acc[cg] = acc.get(cg, []) + ([(d1, d2)] if (e1 == 'f') else [])
+    acc[cg] = acc.get(cg, []) + ([(d1.minute, d2.minute)] if (e1 == 'f') else [])
     return (acc, cg)
 
   sleepmap,_ = ft.reduce(go, zip(events, events[1:]), ({}, None))
   return sleepmap
 
 def part1(sleepmap):
-  sleepy_guard, sleepy_freqs = max_on_dict(lambda rs: sum_ranges(rs, dt.timedelta()), sleepmap)
+  sleepy_guard, sleepy_freqs = max_on_dict(sum_ranges, sleepmap)
 
   def go(rs):
     for i in range(0,60):
       yield (i, count_in_ranges(rs,i))
 
-  best_time = fst(max_dict(dict(go(dt_ranges_to_min_ranges(sleepy_freqs)))))
+  best_time = fst(max_dict(dict(go(sleepy_freqs))))
   return (best_time * sleepy_guard)
 
 def part2(sleepmap):
@@ -85,7 +82,7 @@ def part2(sleepmap):
     for i in range(0,60):
       # for each guard, compute how many times he is asleep in minute i,
       # and find the guard who sleeps the most in minute i
-      x = max_dict(fmap_dict(lambda rs: count_in_ranges(dt_ranges_to_min_ranges(rs), i), sleepmap))
+      x = max_dict(fmap_dict(lambda rs: count_in_ranges(rs, i), sleepmap))
       yield (i,x)
 
   best_min, (best_guard, _) = max_on_dict(snd, dict(go()))
