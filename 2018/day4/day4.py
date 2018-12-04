@@ -106,5 +106,5 @@ def part2(sleepmap):
     return (best_min * best_guard)
 
 sleepmap = build_sleepmap(parse('input.txt'))
-print ('part1 = '+str(part1(sleepmap)))
+print('part1 = '+str(part1(sleepmap)))
 print('part2 = '+str(part2(sleepmap)))
