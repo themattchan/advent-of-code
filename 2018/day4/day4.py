@@ -44,7 +44,8 @@ def count_in_ranges(rs, i):
 def sum_ranges(rs, zero):
   return ft.reduce(lambda acc, r: acc+rangesize(r), rs, zero)
 
-def dt_ranges_to_min_ranges(rs): return list(map(lambda d: (d[0].minute, d[1].minute),rs))
+def dt_ranges_to_min_ranges(rs):
+  return list(map(lambda d: (d[0].minute, d[1].minute),rs))
 
 # given a set of ranges, for each min in the hour, count how many times that minute occs in the set
 # build_freqs_map :: list range[datetime] -> map int int
