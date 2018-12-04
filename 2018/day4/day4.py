@@ -64,8 +64,7 @@ def build_sleepmap(events):
     acc[cg] = acc.get(cg, []) + ([(d1.minute, d2.minute)] if (e1 == 'f') else [])
     return (acc, cg)
 
-  sleepmap,_ = ft.reduce(go, zip(events, events[1:]), ({}, None))
-  return sleepmap
+  return fst(ft.reduce(go, zip(events, events[1:]), ({}, None)))
 
 def part1(sleepmap):
   sleepy_guard, sleepy_freqs = max_on_dict(sum_ranges, sleepmap)
