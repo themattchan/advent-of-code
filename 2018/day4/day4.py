@@ -12,37 +12,33 @@ def compose(g,f): return lambda x: g(f(x))
 
 # parse :: file -> list (date, event)
 def parse(file):
-    def go(file):
-        with open(file) as input:
-            for l in input:
-                m = re.match('\[(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})\] (wakes up|falls asleep|Guard #(\d+) begins shift)', l)
-                d = dt.datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), int(m.group(4)), int(m.group(5)))
-                event = m.group(6)[0]
-                new_guard = m.group(7)
-                x = int(new_guard) if new_guard != None else event
-                yield (d,x)
-    return sorted(go(file), key=fst)
-
-# splitdt :: datetime -> (date,time)
-def splitdt(d):
-  return (dt.date(d.year,d.month,d.day), dt.time(d.hour,d.minute,d.second,d.microsecond,d.tzinfo))
+  def go(file):
+    with open(file) as input:
+      for l in input:
+        m = re.match('\[(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})\] (wakes up|falls asleep|Guard #(\d+) begins shift)', l)
+        d = dt.datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), int(m.group(4)), int(m.group(5)))
+        event = m.group(6)[0]
+        new_guard = m.group(7)
+        x = int(new_guard) if new_guard != None else event
+        yield (d,x)
+  return sorted(go(file), key=fst)
 
 # type range = (int,int)
 
-# inrange :: int -> range -> bool
-def inrange(i,r):
+# in_range :: int -> range -> bool
+def in_range(i,r):
   (x,y) = r
   return (x <= i and y > i)
 
-def rangesize(r):
+def range_size(r):
   (x,y)=r
   return y-x
 
 def count_in_ranges(rs, i):
-  return ft.reduce((lambda acc,r: acc + inrange(i,r)), rs, 0)
+  return ft.reduce((lambda acc, r: acc + in_range(i,r)), rs, 0)
 
 def sum_ranges(rs, zero):
-  return ft.reduce(lambda acc, r: acc+rangesize(r), rs, zero)
+  return ft.reduce(lambda acc, r: acc + range_size(r), rs, zero)
 
 def dt_ranges_to_min_ranges(rs):
   return list(map(lambda d: (d[0].minute, d[1].minute),rs))
