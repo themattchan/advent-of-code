@@ -32,48 +32,55 @@ def inrange(i,r):
   (x,y) = r
   return (x <= i and y >= i)
 
-# b2i :: bool -> int
-def b2i(b):
-  return (1 if b else 0)
+def rangesize(r):
+  (x,y)=r
+  return y-x
 
-# solve1 :: list (date, event) -> int
-def solve1(events):
-    def go(l, r):
-      (acc, cg) = l
-      ((d1,e1),(d2,e2)) = r
+# given a set of ranges, for each min in the hour, count how many times that minute occs in the set
+# build_freqs_map :: list range[datetime] -> map int int
+def build_freqs_map(rs):
+  rs = list(map(lambda d: (d[0].minute, d[1].minute),rs))
+  def gen():
+    for i in range(0,59):
+      x = ft.reduce((lambda acc,r: acc + inrange(i,r)), rs, 0)
+      yield (i, x)
+  return dict(gen())
 
-      # update current guard
-      cg = e1 if isinstance(e1,int) else cg
-      sleeptime = d2-d1 if (e1 == 'f') else dt.timedelta()
-      acc[cg] = acc.get(cg, dt.timedelta())+sleeptime
-      return (acc,cg)
+# build a map of all guards and their sleeping intervals
+def build_sleepmap(events):
+  def go(l, r):
+    (acc, cg) = l
+    ((d1,e1),(d2,e2)) = r
 
-    sleepmap,_ = ft.reduce(go, zip(events, events[1:]), ({}, None))
-    sleepyGuard = max(sleepmap.keys(), key=sleepmap.get)
+    # update current guard
+    cg = e1 if isinstance(e1,int) else cg
+    acc[cg] = acc.get(cg, [])+([(d1,d2)] if (e1 == 'f') else [])
+    return (acc,cg)
 
-    def go2(l,r):
-      (acc, cg) = l
-      ((d1,e1),(d2,e2)) = r
+  sleepmap,_ = ft.reduce(go, zip(events, events[1:]), ({}, None))
+  return sleepmap
 
-      # update current guard
-      cg = e1 if isinstance(e1,int) else cg
-      (date1,time1) = splitdt(d1)
-      (date2,time2) = splitdt(d2)
-      acc = acc+[(time1.minute, time2.minute)] if cg == sleepyGuard and e1 == 'f' else acc
+# best_minute :: freqs_map -> (int, int)
+def best_minute(freqs):
+  k = max(freqs.keys(), key=freqs.get)
+  return (k, freqs[k])
 
-      return (acc,cg)
+################################################################################
 
-    sleepintervals,_ = ft.reduce(go2, zip(events, events[1:]), ([], None))
+events = parse('input.txt')
 
-    # given a set of ranges, for each min in the hour, count how many times that minute occs in the set
-    def build_freqs_map(rs):
-      for i in range(0,59):
-        x = ft.reduce((lambda acc,r: acc + b2i(inrange(i,r))), rs, 0)
-        yield (i, x)
-    freqs_for_mins = dict(build_freqs_map(sleepintervals))
-    bestTime = max(freqs_for_mins.keys(), key=freqs_for_mins.get)
-    return (bestTime * sleepyGuard)
+sleepmap = build_sleepmap(events)
+sleepyGuard = max(sleepmap.keys(), key=lambda k: ft.reduce(lambda acc, r: acc+rangesize(r), sleepmap.get(k), dt.timedelta()))
+
+freqs = build_freqs_map(sleepmap[sleepyGuard])
+
+bestTime = best_minute(freqs)[0]
+
+## part 1
+print (bestTime * sleepyGuard)
 
 
-f = parse('input.txt')
-print(solve1(f))
+
+# all_guards_best = { k: best_minute(build_freqs_map(v)) for k, v in sleepmap.items() }
+# maxSleepyGuard = max(all_guards_best.keys(), key=lambda k: all_guards_best.get(k)[1])
+# print (maxSleepyGuard * all_guards_best[maxSleepyGuard][0])
