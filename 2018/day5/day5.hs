@@ -4,13 +4,10 @@
 
 import qualified Data.Sequence as S
 import Data.Foldable (toList)
-import Data.List.Split
 import Utils
 import Debug.Trace
 
 newtype X = X (S.Seq Char)
-
-xlen (X xs) = S.length xs
 
 polar l r = (isUpper r && isLower l) || (isUpper l && isLower r)
 cmp = (==) `on` toLower
