@@ -30,7 +30,7 @@ def make_solver():
 def solve1(ingredients):
 #    print(ingredients)
     ks = list(ingredients.keys())
-    props = list(filter(lambda p: p != 'calories',ingredients[ks[0]].keys()))
+    props = list(filter(lambda p: p != 'calories', ingredients[ks[0]].keys()))
 
     solver = make_solver()
 
@@ -38,8 +38,8 @@ def solve1(ingredients):
     quantities = { k: solver.Var(value=1, lb=0, ub=100) for k in ks }
 
     # set constraints
-    for k,v in quantities.items(): solver.Equation(- v < 0)
-    solver.Equation(sum([v for k,v in quantities.items()]) - 100 == 0)
+    for v in quantities.values(): solver.Equation(- v < 0)
+    solver.Equation(sum(quantities.values()) - 100 == 0)
 
     # set objective function
     solver.Obj(- (product([sum([quantities[k] * ingredients[k][p] for k in ks]) for p in props])))
@@ -58,7 +58,7 @@ def solve2(ingredients):
 #    print(ingredients)
     ks = list(ingredients.keys())
     props = list(ingredients[ks[0]].keys())
-    props_no_cals = list(filter(lambda p: p != 'calories',props))
+    props_no_cals = list(filter(lambda p: p != 'calories', props))
 
     solver = make_solver()
 
@@ -66,8 +66,8 @@ def solve2(ingredients):
     quantities = { k: solver.Var(value=1, lb=0, ub=100) for k in ks }
 
     # set constraints
-    for k,v in quantities.items(): solver.Equation(- v < 0)
-    solver.Equation(sum([v for k,v in quantities.items()]) - 100 == 0)
+    for v in quantities.values(): solver.Equation(- v < 0)
+    solver.Equation(sum(quantities.values()) - 100 == 0)
     solver.Equation(sum([quantities[k] * ingredients[k]['calories'] for k in ks]) - 500 == 0)
 
     # set objective function
