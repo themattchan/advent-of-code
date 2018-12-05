@@ -65,7 +65,7 @@ def solve2(ingredients):
     for k,v in quantities.items():
         solver.Equation(- v < 0)
     solver.Equation(sum([v for k,v in quantities.items()]) - 100 == 0)
-    solver.Equation(sum([quantities[k] * ingredients[k]['calories'] for k in ks]) - 500 <= 0)
+    solver.Equation(sum([quantities[k] * ingredients[k]['calories'] for k in ks]) - 500 == 0)
 
     solver.Obj(- (product([sum([quantities[k] * ingredients[k][p] for k in ks]) for p in props])))
 
@@ -79,6 +79,7 @@ def solve2(ingredients):
 
     return (result, objresult)
 
+#print(make_solver() != make_solver())
 ingredients = parse('input')
 #print(solve1(ingredients))
 print(solve2(ingredients))
