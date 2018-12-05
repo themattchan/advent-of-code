@@ -34,12 +34,14 @@ def solve1(ingredients):
 
     solver = make_solver()
 
+    # make variables
     quantities = { k: solver.Var(value=1, lb=0, ub=100) for k in ks }
 
-    for k,v in quantities.items():
-        solver.Equation(- v < 0)
+    # set constraints
+    for k,v in quantities.items(): solver.Equation(- v < 0)
     solver.Equation(sum([v for k,v in quantities.items()]) - 100 == 0)
 
+    # set objective function
     solver.Obj(- (product([sum([quantities[k] * ingredients[k][p] for k in ks]) for p in props])))
 
     solver.solve(disp=False)
@@ -60,13 +62,15 @@ def solve2(ingredients):
 
     solver = make_solver()
 
+    # make variables
     quantities = { k: solver.Var(value=1, lb=0, ub=100) for k in ks }
 
-    for k,v in quantities.items():
-        solver.Equation(- v < 0)
+    # set constraints
+    for k,v in quantities.items(): solver.Equation(- v < 0)
     solver.Equation(sum([v for k,v in quantities.items()]) - 100 == 0)
     solver.Equation(sum([quantities[k] * ingredients[k]['calories'] for k in ks]) - 500 == 0)
 
+    # set objective function
     solver.Obj(- (product([sum([quantities[k] * ingredients[k][p] for k in ks]) for p in props])))
 
     solver.solve(disp=False)
@@ -81,5 +85,5 @@ def solve2(ingredients):
 
 #print(make_solver() != make_solver())
 ingredients = parse('input')
-#print(solve1(ingredients))
+print(solve1(ingredients))
 print(solve2(ingredients))
