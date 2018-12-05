@@ -21,8 +21,9 @@ bool check3conseq(char * s)
 bool noiol(char *s)
 {
 	while (s) {
-		if ((int)(*s) == 105 || (int)(*s) == 108 || (int)(*s) == 111)
+		if ((int)(*s) == 105 || (int)(*s) == 108 || (int)(*s) == 111) {
 			return false;
+		}
 		s++;
 	}
 	return true;
@@ -70,9 +71,15 @@ int main(int argc, char * argv[])
 	int end = strlen(in) -1;
 //	printf("strlen: %d\n", end);
 //	printf("lastchar: %c\n", *(in+end));
+	/* if (! twooverlap(in)) {
+	 * }
+	 * if (! noiol(in)) {
+	 * 	char *s
+	 * 	for
+	 * } */
 	while (! (check3conseq(in) && noiol(in) && twooverlap(in))) {
 		incrs(in, in+end);
-//		printf("INCREMENTED: %s\n",in);
+		//		printf("INCREMENTED: %s\n",in);
 	}
 	puts(in);
 	return 0;

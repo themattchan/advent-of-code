@@ -1,0 +1,24 @@
+by reasoning:
+
+1. no i, o, l. so if these chars occur then increment by 1
+
+2. two different, nonoverlapping pairs
+
+3. one increasing sequence
+
+requirements 2+3 means that the shortest change will be to create a sequence of the form
+
+nn(n+1)(n+2)(n+2)
+
+and because we increment from the right,
+this string must be the last 5 characters.
+
+hxbxwxba
+
+->
+
+hxbxxyzz
+
+->
+
+hxcaabcc
