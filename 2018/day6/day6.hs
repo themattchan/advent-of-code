@@ -23,11 +23,13 @@ main = do
 
 --  let closestPoint pt = V.minIndexBy (compare `on` dist pt) coords
   -- if there are multiple points with the same dist, nothing.
-  let closestPoint pt =
-        let ds = V.map (dist pt) coords in
-        let mi = V.minIndex ds in
-        let ms = V.elemIndices (ds V.! mi) ds in
-        if V.length ms > 1 then Nothing else Just mi
+  let closestPoint pt
+        | V.length ms > 1 = Nothing
+        | otherwise = Just mi
+        where
+          ds = V.map (dist pt) coords
+          mi = V.minIndex ds
+          ms = V.elemIndices (ds V.! mi) ds
 
   let isEdge (i,j) = i == 1 || i == 500 || j == 1 || j == 500
   let grid = [(c, closestPoint c) | i <- [1..500], j <- [1..500], let c = (i,j)]
