@@ -3,10 +3,7 @@
 -- ghc day6.hs  -O2 -i../../
 {-# LANGUAGE TypeApplications #-}
 
-import qualified Data.Array as A
 import qualified Data.Vector.Unboxed as V
-import qualified Data.Sequence as S
-import Data.Foldable (toList)
 import Utils
 import Debug.Trace
 
