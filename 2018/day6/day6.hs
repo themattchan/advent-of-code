@@ -34,8 +34,7 @@ main = do
   let grid = [(c, closestPoint c) | i <- [1..500], j <- [1..500], let c = (i,j)]
   let (edges, rest) = partition (isEdge . fst) grid
   let edgeIndices = (nub . mapMaybe snd) edges
-  let indexFreqs = (map (head &&& length) . group . sort . mapMaybe snd) rest
-  let bestArea = maximum $ map snd $ filter ((`notElem` edgeIndices) . fst) indexFreqs
+  let bestArea = (maximum . map length . group . sort . filter (`notElem` edgeIndices) . mapMaybe snd) rest
   print bestArea
 
   -- part 2
