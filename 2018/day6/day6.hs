@@ -18,6 +18,8 @@ main = do
 
   let dist (p1,p2) (q1,q2) = abs(p1-q1) + abs(p2-q2)
 
+  let gridPoints = [(i,j) | i <- [1..500], j <- [1..500]]
+
   -- part 1
 
   --  let closestPoint pt = V.minIndexBy (compare `on` dist pt) coords
@@ -31,7 +33,7 @@ main = do
           ms = V.elemIndices (ds V.! mi) ds
 
   let isEdge (i,j) = i == 1 || i == 500 || j == 1 || j == 500
-  let grid = [(c, closestPoint c) | i <- [1..500], j <- [1..500], let c = (i,j)]
+  let grid = map (fmap closestPoint . dup) gridPoints
   let (edges, rest) = partition (isEdge . fst) grid
   let edgeIndices = (nub . mapMaybe snd) edges
   let bestArea = (maximum . map length . group . sort . filter (`notElem` edgeIndices) . mapMaybe snd) rest
@@ -40,6 +42,6 @@ main = do
   -- part 2
 
   let distToAll pt = V.foldl' (\s c -> s + dist pt c) 0 coords
-  let area2 = foldl' (\s -> bool s (s+1) . (< 10000) . distToAll) 0 [(i,j) | i <- [1..500], j <- [1..500]]
+  let area2 = foldl' (\s -> bool s (s+1) . (< 10000) . distToAll) 0 gridPoints
 --  let area2 = length [() | i <- [1..500], j <- [1..500], let c = (i,j), distToAll c < 10000]
   print area2
