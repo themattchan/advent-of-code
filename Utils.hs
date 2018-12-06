@@ -68,7 +68,7 @@ window n xs = take (length xs - n + 1)
             $ unfoldr (Just . (take n &&& tail)) (cycle xs)
 
 tally :: (Foldable t, Ord a) => t a -> M.Map a Int
-tally = foldr (\x m -> M.insertWith (+) x 1 m) mempty
+tally = foldl' (\m x -> M.insertWith (+) x 1 m) mempty
 {-# INLINEABLE tally #-}
 {-# SPECIALISE tally :: [Int] -> M.Map Int Int #-}
 {-# SPECIALISE tally :: [String] -> M.Map String Int #-}
