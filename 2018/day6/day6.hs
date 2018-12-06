@@ -33,7 +33,7 @@ main = do
           ms = V.elemIndices (ds V.! mi) ds
 
   let isEdge (i,j) = i == 1 || i == 500 || j == 1 || j == 500
-  let grid = map (fmap closestPoint . dup) gridPoints
+  let grid = map (id &&& closestPoint) gridPoints
   let (edges, rest) = partition (isEdge . fst) grid
   let edgeIndices = (nub . mapMaybe snd) edges
   let bestArea = (maximum . map length . group . sort . filter (`notElem` edgeIndices) . mapMaybe snd) rest
