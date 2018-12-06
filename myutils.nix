@@ -1,8 +1,8 @@
-{ mkDerivation, base, stdenv }:
+{ mkDerivation, base, containers, stdenv }:
 mkDerivation {
   pname = "myutils";
   version = "1.0.0";
   src = ./.;
-  libraryHaskellDepends = [ base ];
+  libraryHaskellDepends = [ base containers ];
   license = stdenv.lib.licenses.bsd3;
 }

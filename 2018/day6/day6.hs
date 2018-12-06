@@ -4,6 +4,7 @@
 {-# LANGUAGE TypeApplications #-}
 
 import qualified Data.Vector.Unboxed as V
+import qualified Data.Map as M
 import Utils
 import Debug.Trace
 
@@ -36,7 +37,8 @@ main = do
   let grid = map (id &&& closestPoint) gridPoints
   let (edges, rest) = partition (isEdge . fst) grid
   let edgeIndices = (nub . mapMaybe snd) edges
-  let bestArea = (maximum . map length . group . sort . filter (`notElem` edgeIndices) . mapMaybe snd) rest
+--  let bestArea = (maximum . map length . group . sort . filter (`notElem` edgeIndices) . mapMaybe snd) rest
+  let bestArea = (maximum . tally . filter (`notElem` edgeIndices) . mapMaybe snd) rest
   print bestArea
 
   -- part 2

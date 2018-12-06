@@ -31,6 +31,7 @@ import Data.Foldable
 --import Data.Semigroup
 import Data.Tuple (swap)
 import Data.Maybe
+import qualified Data.Map.Strict as M
 import Data.Monoid
 import Data.List
 import Data.Ord (comparing)
@@ -65,6 +66,12 @@ headMay (x:_) = Just x
 window :: Int -> [a] -> [[a]]
 window n xs = take (length xs - n + 1)
             $ unfoldr (Just . (take n &&& tail)) (cycle xs)
+
+tally :: (Foldable t, Ord a) => t a -> M.Map a Int
+tally = foldr (\x m -> M.insertWith (+) x 1 m) mempty
+{-# INLINEABLE tally #-}
+{-# SPECIALISE tally :: [Int] -> M.Map Int Int #-}
+{-# SPECIALISE tally :: [String] -> M.Map String Int #-}
 
 --------------------------------------------------------------------------------
 -- * Parser combinators
