@@ -28,13 +28,16 @@ t1 is = trace ("vs: " <> show vs) $ map (\x -> fst $ fromJust $ find ((== x) . s
     getIt (Just (_,ss,_)) = edge $ foldMap ((:[]) . fst) ss
     getIt Nothing = error "regex failed"
 
-    edge [_,[x],[y]] = trace ([x]<> " " <>[y]) [(x, y)]
+    edge [_,[x],[y]] = trace ([x]<> " " <>[y]) [(y,x)] -- y depends on x
     edge x = error ("edge: " <> show x)
 
+-- g is a "depends on" graph
+
 --myTopSort :: [G.Edge] -> G.Graph -> [G.Vertex]
-myTopSort vs es g = go [] (go [] (G.vertices g))
+myTopSort vs es g = go [] (G.vertices g)
   where
-    vOuts done v = reverse $ sort [j | (i,j) <- es, i==v, j `notElem` done]
+    vOuts v = undefined
+--    vOuts done v = sort [j | (i,j) <- es, i==v, j `notElem` done]
     go out [] = out
     go out (v:todo)
 --      | trace ("DO: "<> show v <> show (lookup v (map swap vs))) False = undefined
@@ -45,4 +48,4 @@ myTopSort vs es g = go [] (go [] (G.vertices g))
 
 
 
-main = putStrLn . t1 . lines =<< readFile "input"
+main = putStrLn . t1 . lines =<< readFile "test"
