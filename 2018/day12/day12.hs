@@ -9,7 +9,10 @@ main = do
         where
           go x = let [pat, [replace]] = splitOn " => " x in (pat,replace)
 -- FIXME: '.' extends infinitely to left and right!!
-  let step = map (rules M.!) . window 5
+  let extend = ("....." <>) . (<> ".....") -- subtract 3 each iteration
+  let leftmostIdx n = (- 3) * n
+  let step = map (rules M.!) . window 5 . extend
   let system = iterate step initSt
---  zipWith [-2..] $ system !! 20
-  print $ take 21 system
+  let computeFor n = sum [ i |(i,c) <- zip [leftmostIdx n ..] (system !! n), c == '#' ]
+  print $ computeFor 20
+--  print $ computeFor 50000000000
