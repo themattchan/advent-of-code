@@ -1,4 +1,4 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TupleSections, TypeApplications #-}
 module Utils
   ( module Utils
   , module Control.Applicative
@@ -21,6 +21,7 @@ module Utils
 import Control.Applicative
 import Control.Arrow ((***), (&&&), (>>>), (<<<))
 import Control.Monad
+import qualified Data.Array as A
 import Data.Bits
 import Data.Bifunctor
 import Data.Bool (bool)
@@ -36,6 +37,8 @@ import Data.Monoid
 import Data.List
 import Data.Ord (comparing)
 import Text.Printf
+import qualified Text.Regex.TDFA as RE
+import qualified Text.Regex.TDFA.String as RE
 import System.CPUTime
 import Numeric (showHex, showIntAtBase)
 
@@ -72,6 +75,31 @@ tally = foldl' (\m x -> M.insertWith (+) x 1 m) mempty
 {-# INLINEABLE tally #-}
 {-# SPECIALISE tally :: [Int] -> M.Map Int Int #-}
 {-# SPECIALISE tally :: [String] -> M.Map String Int #-}
+--------------------------------------------------------------------------------
+-- * Regex
+
+type Regex = RE.Regex
+
+type Match = Int -> String
+
+makeRegex :: String -> Regex
+makeRegex = RE.makeRegex @Regex @_ @_ @String
+
+matchAll :: Regex -> String -> Maybe [String]
+matchAll re s = toMatch <$> RE.matchOnceText rgx s
+  where
+    toMatch (_, m, _) = A.toList m
+
+matchAll' :: Regex -> String -> [String]
+matchAll' = fromJust ... matchAll
+
+match :: Regex -> String -> Maybe Match
+match re s = toMatch <$> RE.matchOnceText rgx s
+  where
+    toMatch (_, m, _) = (m A.!)
+
+match' :: RE.Regex -> String -> Match
+match' = fromJust ... match
 
 --------------------------------------------------------------------------------
 -- * Parser combinators
