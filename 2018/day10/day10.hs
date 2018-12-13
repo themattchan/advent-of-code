@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 import Utils
-import qualified Data.IntMap as M
+import qualified Data.Set as S
 
 data P = P {x,y,dx,dy:: !Int} deriving (Show, Eq)
 
@@ -36,13 +36,13 @@ shrink !i ps
 
 doit = unlines . uncurry (:) . bimap show (pp .  normalise) . shrink 0
   where
-    pp ps = [ [ if isJust (M.lookup y pointsMap >>= find (==x)) then '#' else '.'
+    pp ps = [ [ if S.member (x,y) points then '#' else '.'
               | x <- [minx..maxx]
               ]
             | y <- [miny..maxy]
             ]
       where
-        pointsMap = M.fromList [ (y (head g), map x g) | g <- groupBy ((==) `on` y) (sort ps)]
+        points = S.fromList (map (x &&& y) ps)
 
         minx = minimum $ map x ps
         maxx = maximum $ map x ps
