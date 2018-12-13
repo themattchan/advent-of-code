@@ -86,17 +86,17 @@ makeRegex :: String -> Regex
 makeRegex = RE.makeRegex @Regex @_ @_ @String
 
 matchAll :: Regex -> String -> Maybe [String]
-matchAll re s = toMatch <$> RE.matchOnceText rgx s
+matchAll re s = toMatch <$> RE.matchOnceText re s
   where
-    toMatch (_, m, _) = A.toList m
+    toMatch (_, m, _) = map fst $ toList m
 
 matchAll' :: Regex -> String -> [String]
 matchAll' = fromJust ... matchAll
 
 match :: Regex -> String -> Maybe Match
-match re s = toMatch <$> RE.matchOnceText rgx s
+match re s = toMatch <$> RE.matchOnceText re s
   where
-    toMatch (_, m, _) = (m A.!)
+    toMatch (_, m, _) = fst . (m A.!)
 
 match' :: RE.Regex -> String -> Match
 match' = fromJust ... match
