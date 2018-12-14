@@ -3,11 +3,15 @@
 
 #define INPUT 681901
 
+#define M(i,n) ((buf[x+i]==n))
+
+#define SIZE (INPUT*100) // INPUT+10
+
 typedef unsigned char D;
 
 int main ()
 {
-  D *buf = (D*) calloc((INPUT+10), sizeof(D));
+  D *buf = (D*) calloc(SIZE, sizeof(D));
 
   buf[0] = 3;
   buf[1] = 7;
@@ -16,7 +20,7 @@ int main ()
     int i = 0;
     int j = 1;
     int cur = 2;
-    while (cur < INPUT+10) {
+    while (cur < SIZE) {
       D ix = buf[i];
       D jx = buf[j];
       D x = ix+jx;
@@ -31,8 +35,16 @@ int main ()
     }
   }
 
+  printf("part1: ");
   for (int i = INPUT; i < INPUT+10; ++i) putchar(buf[i] + '0');
   putchar('\n');
+
+  for (int x = 0; x < SIZE; ++x) {
+    if (M(0,6) && M(1,8) && M(2,1) && M(3,9) && M(4,0) && M(5,1)) {
+      printf("part2: %d\n",x);
+      break;
+    }
+  }
 
   free(buf);
   return 0;
