@@ -2,10 +2,9 @@
 #include <stdio.h>
 
 #define INPUT 681901
+#define SIZE (INPUT*100) // INPUT+10
 
 #define M(i,n) ((buf[x+i]==n))
-
-#define SIZE (INPUT*100) // INPUT+10
 
 typedef unsigned char D;
 
