@@ -11,7 +11,6 @@ typedef unsigned char D;
 int main ()
 {
   D *buf = (D*) calloc(SIZE, sizeof(D));
-
   buf[0] = 3;
   buf[1] = 7;
 
