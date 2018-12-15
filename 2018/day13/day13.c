@@ -28,78 +28,107 @@ struct cart
   int y;
   Dir dir;
   Turn turn;
-  struct cart * next;
 };
 
-struct cart * make_cart(int x, int y, Dir d, struct cart * carts)
-{
-  struct cart * cart = (struct cart *) malloc(sizeof(struct cart));
-  cart->x = x;
-  cart->y = y;
-  cart->dir = d;
-  cart->turn = LEFT;
-  cart->next = carts;
-  return cart;
-}
-
-void free_carts(struct cart * carts)
-{
-  while (carts) {
-    struct cart * next = carts->next;
-    free(carts);
-    carts = next;
-  }
-}
+/* int sort_carts(const void * c1, const void * c2)
+ * {
+ * } */
 
 int main ()
 {
   int WIDTH = 0;
   int HEIGHT = 0;
-  char* map;
+  int NUM_CARTS = 0;
+  char *map = NULL;
+  struct cart * carts = NULL;
 
   // input parsing
   {
     FILE *fp;
-    // find width and height
-    {
-      fp = fopen("input", "r");
-      char c;
-      int widthl = 0;
-      while ((c = getc(fp)) != EOF) {
-        if (c == '\n') {
-          HEIGHT++;
-          if (widthl > WIDTH) WIDTH = widthl;
-          widthl = 0;
-        }
-        else {
-          widthl++;
-        }
+    // preprocessing
+    fp = fopen("input", "r");
+    char c;
+    int widthl = 0;
+    while ((c = getc(fp)) != EOF) {
+      if (c == '\n') {
+        HEIGHT++;
+        if (widthl > WIDTH) WIDTH = widthl;
+        widthl = 0;
+      }
+      else {
+        if (c == '<' || c == '>' || c == '^' || c == 'V')
+          NUM_CARTS++;
+        widthl++;
       }
     }
-    fp = fopen("input", "r");
+
+    rewind(fp);
+
     map = (char*) calloc(WIDTH*HEIGHT, sizeof(char));
-    struct cart * carts = NULL;
+    carts = (struct cart*) calloc(NUM_CARTS, sizeof(struct cart));
 
     // actually parse it
-    {
-      int x = 0;
-      int y = 0;
-      char c;
-      while ((c = getc(fp)) != EOF) {
+    int x = 0;
+    int y = 0;
+    int cur_cart = 0;
+    while ((c = getc(fp)) != EOF) {
+      if (c =='\n') {
+        y++;
+        x = 0;
+      }
+      else {
+        switch (c) {
+        case '<':
+          carts[cur_cart].x = x;
+          carts[cur_cart].y = y;
+          carts[cur_cart].dir = L;
+          carts[cur_cart].turn = LEFT;
+          cur_cart++;
+          MAP(x,y) = '-';
+          break;
 
-        if (c == '\n') {
-          y++;
-          x = 0;
-        } else {
+        case '>':
+          carts[cur_cart].x = x;
+          carts[cur_cart].y = y;
+          carts[cur_cart].dir = R;
+          carts[cur_cart].turn = LEFT;
+          cur_cart++;
+          MAP(x,y) = '-';
+          break;
 
+        case '^':
+          carts[cur_cart].x = x;
+          carts[cur_cart].y = y;
+          carts[cur_cart].dir = U;
+          carts[cur_cart].turn = LEFT;
+          cur_cart++;
+          MAP(x,y) = '|';
+          break;
+
+        case 'V':
+          carts[cur_cart].x = x;
+          carts[cur_cart].y = y;
+          carts[cur_cart].dir = D;
+          carts[cur_cart].turn = LEFT;
+          cur_cart++;
+          MAP(x,y) = '|';
+          break;
+
+        default:
           MAP(x,y) = c;
-          // parse the carts
-          carts
+          break;
         }
+        x++;
       }
     }
+    fclose(fp);
   }
 
+  for (int i = 0; i < NUM_CARTS; ++i) {
+    printf("Cart %d: x=%d, y=%d\n", i, carts[i].x, carts[i].y);
+  }
 
+  free(map);
+  free(carts);
   return 0;
 }
