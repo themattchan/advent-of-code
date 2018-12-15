@@ -1,10 +1,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <stdbool.h>
+
+//
+// globals
+//
+
+int WIDTH = 0;
+int HEIGHT = 0;
+int NUM_CARTS = 0;
+
+char *map = NULL;
+struct cart * carts = NULL;
 
 #define MAP(x,y) (map[(y*HEIGHT)+x])
 
+
+//
 // directions
+//
+
 #define U 0
 #define R 1
 #define D 2
@@ -14,13 +30,20 @@
 
 typedef char Dir;
 
+//
 // intersection turns
+//
+
 #define LEFT 0
 #define STRAIGHT 1
 #define RIGHT 2
 #define NEXT_INTERSECTION_TURN(x) ((((x)+1)%3))
 
 typedef char Turn;
+
+//
+// carts
+//
 
 struct cart
 {
@@ -38,16 +61,48 @@ inline void make_cart(struct cart * cart, int x, int y, Dir d)
   cart->turn = LEFT;
 }
 
-/* int sort_carts(const void * c1, const void * c2)
- * {
- * } */
+// return -1 if c1p comes first, 0 if equal, 1 if c2p comes first
+int sort_carts_cmp(const void * c1p, const void * c2p)
+{
+  struct cart * c1 = (struct cart *) c1p;
+  struct cart * c2 = (struct cart *) c2p;
 
-int WIDTH = 0;
-int HEIGHT = 0;
-int NUM_CARTS = 0;
+  int dy = (c1->y) - (c2->y);
+  if (dy == 0) return (c1->x) - (c2->x);
+  else return dy;
 
-char *map = NULL;
-struct cart * carts = NULL;
+  /* // there is probably a nice arithmetic way to take care of this...
+   * if (c1->y < c2->y) return -1;
+   * else if (c1->y == c2->y) {
+   *   if (c1->x == c2->x) return 0;
+   *   else if (c1->x < c2->x) return -1;
+   *   else return 1;
+   * }
+   * else return -1; */
+}
+
+inline void sort_carts(struct cart * carts)
+{
+  qsort((void*)carts, NUM_CARTS, sizeof(struct cart), sort_carts_cmp);
+}
+
+// INPUT: a sorted carts array
+bool check_collision(struct cart *carts)
+{
+  for (int i = 0; i < NUM_CARTS-1; ++i) {
+    if (carts[i].x == carts[i+1].x &&
+        carts[i].y == carts[i+1].y)
+      {
+        printf("collision at %d,%d\n", carts[i].x, carts[i].y);
+        return true;
+      }
+  }
+  return false;
+}
+
+//
+// main
+//
 
 int main ()
 {
@@ -128,6 +183,15 @@ int main ()
    *   }
    *   putchar('\n');
    * } */
+
+  while (1) {
+    sort_carts(carts);
+    if (check_collision(carts)) break;
+    for (int i = 0; i < NUM_CARTS; ++i) {
+      // move it
+      carts[i]
+    }
+  }
 
   free(map);
   free(carts);
