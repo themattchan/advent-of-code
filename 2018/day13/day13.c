@@ -30,6 +30,14 @@ struct cart
   Turn turn;
 };
 
+inline void make_cart(struct cart * cart, int x, int y, Dir d)
+{
+  cart->x = x;
+  cart->y = y;
+  cart->dir = d;
+  cart->turn = LEFT;
+}
+
 /* int sort_carts(const void * c1, const void * c2)
  * {
  * } */
@@ -81,38 +89,22 @@ int main ()
       else {
         switch (c) {
         case '<':
-          carts[cur_cart].x = x;
-          carts[cur_cart].y = y;
-          carts[cur_cart].dir = L;
-          carts[cur_cart].turn = LEFT;
-          cur_cart++;
+          make_cart(&carts[cur_cart++], x, y, L);
           MAP(x,y) = '-';
           break;
 
         case '>':
-          carts[cur_cart].x = x;
-          carts[cur_cart].y = y;
-          carts[cur_cart].dir = R;
-          carts[cur_cart].turn = LEFT;
-          cur_cart++;
+          make_cart(&carts[cur_cart++], x, y, R);
           MAP(x,y) = '-';
           break;
 
         case '^':
-          carts[cur_cart].x = x;
-          carts[cur_cart].y = y;
-          carts[cur_cart].dir = U;
-          carts[cur_cart].turn = LEFT;
-          cur_cart++;
+          make_cart(&carts[cur_cart++], x, y, U);
           MAP(x,y) = '|';
           break;
 
         case 'V':
-          carts[cur_cart].x = x;
-          carts[cur_cart].y = y;
-          carts[cur_cart].dir = D;
-          carts[cur_cart].turn = LEFT;
-          cur_cart++;
+          make_cart(&carts[cur_cart++], x, y, D);
           MAP(x,y) = '|';
           break;
 
@@ -126,9 +118,9 @@ int main ()
     fclose(fp);
   }
 
-  /* for (int i = 0; i < NUM_CARTS; ++i) {
-   *   printf("Cart %d: x=%d, y=%d, dir=%d\n", i, carts[i].x, carts[i].y, carts[i].dir);
-   * } */
+  for (int i = 0; i < NUM_CARTS; ++i) {
+    printf("Cart %d: x=%d, y=%d, dir=%d\n", i, carts[i].x, carts[i].y, carts[i].dir);
+  }
 
   /* for (int i = 0; i < HEIGHT; ++i) {
    *   for (int j = 0; j < WIDTH; ++j) {
