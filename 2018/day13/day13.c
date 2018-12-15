@@ -14,6 +14,7 @@ int NUM_CARTS = 0;
 char *map = NULL;
 struct cart * carts = NULL;
 
+// char MAP(int,int)
 #define MAP(x,y) (map[(y*HEIGHT)+x])
 
 
@@ -30,6 +31,16 @@ struct cart * carts = NULL;
 
 typedef char Dir;
 
+const char * print_dir(Dir d)
+{
+  switch (d) {
+  case U: return "UP";
+  case D: return "DOWN";
+  case L: return "LEFT";
+  case R: return "RIGHT";
+  }
+}
+
 //
 // intersection turns
 //
@@ -40,6 +51,15 @@ typedef char Dir;
 #define NEXT_INTERSECTION_TURN(x) ((((x)+1)%3))
 
 typedef char Turn;
+
+const char * print_turn(Turn d)
+{
+  switch (d) {
+  case LEFT: return "LEFT";
+  case STRAIGHT: return "STRAIGHT";
+  case RIGHT: return "RIGHT";
+  }
+}
 
 //
 // carts
@@ -70,15 +90,6 @@ int sort_carts_cmp(const void * c1p, const void * c2p)
   int dy = (c1->y) - (c2->y);
   if (dy == 0) return (c1->x) - (c2->x);
   else return dy;
-
-  /* // there is probably a nice arithmetic way to take care of this...
-   * if (c1->y < c2->y) return -1;
-   * else if (c1->y == c2->y) {
-   *   if (c1->x == c2->x) return 0;
-   *   else if (c1->x < c2->x) return -1;
-   *   else return 1;
-   * }
-   * else return -1; */
 }
 
 inline void sort_carts(struct cart * carts)
@@ -186,14 +197,84 @@ int main ()
 
   while (1) {
     sort_carts(carts);
+
     if (check_collision(carts)) break;
+
     for (int i = 0; i < NUM_CARTS; ++i) {
-      // move it
-      carts[i]
-    }
-  }
+      // turn then move
+      struct cart * k = &carts[i];
+      char cur = MAP(k->x, k->y);
+      switch (cur) {
+      case '|':
+        switch (k->dir) {
+        case U: (k->y)--; break;
+        case D: (k->y)++; break;
+        default: goto fail;
+        }
+        break;
+      case '-':
+        switch (k->dir) {
+        case L: (k->x)--; break;
+        case R: (k->x)++; break;
+        default: goto fail;
+        }
+        break;
+
+      case '/':
+        switch (k->dir) {
+          // moving up, go right
+        case U: (k->dir) = TURN_RIGHT(k->dir); (k->x)++; break;
+          // moving left FROM RIGHT, go down
+        case L: (k->dir) = TURN_LEFT(k->dir); (k->y)++; break;
+          // go left
+        case D: (k->dir) = TURN_RIGHT(k->dir); (k->x)--; break;
+          // moving right FROM LEFT, go up
+        case R: (k->dir) = TURN_LEFT(k->dir); (k->y)--; break;
+        }
+        break;
+
+      case '\\':
+        switch (k->dir) {
+          // gg left
+        case U: (k->dir) = TURN_LEFT(k->dir); (k->x)--; break;
+          // moving left FROM RIGHT, go up
+        case L: (k->dir) = TURN_RIGHT(k->dir); (k->y)--; break;
+          // go right
+        case D: (k->dir) = TURN_LEFT(k->dir); (k->x)++; break;
+          // go down
+        case R: (k->dir) = TURN_RIGHT(k->dir); (k->y)++; break;
+        }
+        break;
+
+      case '+':
+        switch (k->turn) {
+        case LEFT: (k->dir) = TURN_LEFT(k->dir); break;
+        case STRAIGHT: break;
+        case RIGHT: (k->dir) = TURN_RIGHT(k->dir); break;
+        }
+        (k->turn) = NEXT_INTERSECTION_TURN(k->turn);
+
+        switch (k->dir) {
+        case U: (k->y)--; break;
+        case D: (k->y)++; break;
+        case L: (k->x)--; break;
+        case R: (k->x)++; break;
+        }
+        break;
+      } // end switch(cur)
+
+      continue;
+
+
+    fail:
+      printf("Invalid move: cart[%d] at (%d,%d) going %s but map piece is %c\n", i, k->x,k->y, print_dir(k->dir), cur);
+      return EXIT_FAILURE;
+
+    } // end for(k in carts)
+  } // end while(1)
 
   free(map);
   free(carts);
-  return 0;
+
+  return EXIT_SUCCESS;
 }
