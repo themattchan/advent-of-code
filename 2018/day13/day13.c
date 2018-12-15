@@ -42,15 +42,15 @@ inline void make_cart(struct cart * cart, int x, int y, Dir d)
  * {
  * } */
 
+int WIDTH = 0;
+int HEIGHT = 0;
+int NUM_CARTS = 0;
+
+char *map = NULL;
+struct cart * carts = NULL;
+
 int main ()
 {
-  int WIDTH = 0;
-  int HEIGHT = 0;
-  int NUM_CARTS = 0;
-
-  char *map = NULL;
-  struct cart * carts = NULL;
-
   // input parsing
   {
     FILE *fp;
@@ -118,9 +118,9 @@ int main ()
     fclose(fp);
   }
 
-  for (int i = 0; i < NUM_CARTS; ++i) {
-    printf("Cart %d: x=%d, y=%d, dir=%d\n", i, carts[i].x, carts[i].y, carts[i].dir);
-  }
+  /* for (int i = 0; i < NUM_CARTS; ++i) {
+   *   printf("Cart %d: x=%d, y=%d, dir=%d\n", i, carts[i].x, carts[i].y, carts[i].dir);
+   * } */
 
   /* for (int i = 0; i < HEIGHT; ++i) {
    *   for (int j = 0; j < WIDTH; ++j) {
