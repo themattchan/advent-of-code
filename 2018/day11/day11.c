@@ -43,6 +43,8 @@ int main ()
     printf("part1: %d,%d\n", maxX, maxY);
   }
 
+  // you can probably optimise this further by exploiting some property of
+  // overlapping squares
   {
     int maxY = 0;
     int maxX = 0;
@@ -82,3 +84,8 @@ int main ()
 
   return 0;
 }
+
+/*  time ./day11
+ * part1: 20,46
+ * part2: 231,65,14
+ * ./day11  0.68s user 0.00s system 99% cpu 0.679 total */
