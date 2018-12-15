@@ -9,7 +9,7 @@
 #define R 1
 #define D 2
 #define L 3
-#define TURN_RIGHT(x) (((x+1)%4))
+#define TURN_RIGHT(x) ((((x)+1)%4))
 #define TURN_LEFT(x) ((((x-1)+4)%4))
 
 typedef char Dir;
@@ -39,6 +39,7 @@ int main ()
   int WIDTH = 0;
   int HEIGHT = 0;
   int NUM_CARTS = 0;
+
   char *map = NULL;
   struct cart * carts = NULL;
 
@@ -73,6 +74,7 @@ int main ()
     int cur_cart = 0;
     while ((c = getc(fp)) != EOF) {
       if (c =='\n') {
+        for (; x < WIDTH; ++x) MAP(x,y) = ' ';
         y++;
         x = 0;
       }
@@ -124,9 +126,16 @@ int main ()
     fclose(fp);
   }
 
-  for (int i = 0; i < NUM_CARTS; ++i) {
-    printf("Cart %d: x=%d, y=%d\n", i, carts[i].x, carts[i].y);
-  }
+  /* for (int i = 0; i < NUM_CARTS; ++i) {
+   *   printf("Cart %d: x=%d, y=%d, dir=%d\n", i, carts[i].x, carts[i].y, carts[i].dir);
+   * } */
+
+  /* for (int i = 0; i < HEIGHT; ++i) {
+   *   for (int j = 0; j < WIDTH; ++j) {
+   *     putchar(MAP(j,i));
+   *   }
+   *   putchar('\n');
+   * } */
 
   free(map);
   free(carts);
