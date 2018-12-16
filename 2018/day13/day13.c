@@ -27,6 +27,7 @@ struct cart * carts = NULL;
 #define R 1
 #define D 2
 #define L 3
+
 #define TURN_RIGHT(x) ((((x)+1)%4))
 #define TURN_LEFT(x) ((((x-1)+4)%4))
 
@@ -75,6 +76,7 @@ cart
 {
   int x;
   int y;
+  bool has_turned;
   Dir dir;
   Turn turn;
 };
@@ -84,6 +86,7 @@ make_cart(struct cart * cart, int x, int y, Dir d)
 {
   cart->x = x;
   cart->y = y;
+  cart->has_turned = false;
   cart->dir = d;
   cart->turn = LEFT;
 }
@@ -253,16 +256,19 @@ main(int argc, char * argv[])
   print_carts_state();
 
   while (1) {
-    //print_state();
+    print_state();
 
     sort_carts(carts);
 
     if (check_collision(carts)) break;
 
     for (int i = 0; i < NUM_CARTS; ++i) {
-      // turn then move
       struct cart * k = &carts[i];
-      char cur = MAP(k->x, k->y);
+
+      char cur;
+
+      // move
+      cur = MAP(k->x, k->y);
       switch (cur) {
       case '|':
         switch (k->dir) {
@@ -271,6 +277,7 @@ main(int argc, char * argv[])
         default: goto fail;
         }
         break;
+
       case '-':
         switch (k->dir) {
         case L: (k->x)--; break;
@@ -280,47 +287,58 @@ main(int argc, char * argv[])
         break;
 
       case '/':
+      case '\\':
+      case '+':
+        switch (k->dir) {
+        case U: (k->y)--; break;
+        case L: (k->x)--; break;
+        case D: (k->y)++; break;
+        case R: (k->x)++; break;
+        }
+        break;
+      } // end switch(cur)
+
+      // try turn
+      cur = MAP(k->x, k->y);
+      switch (cur) {
+      case '/':
         switch (k->dir) {
           // moving up, go right
-        case U: (k->dir) = TURN_RIGHT(k->dir); (k->x)++; break;
+        case U: (k->dir) = TURN_RIGHT(k->dir); break;
           // moving left FROM RIGHT, go down
-        case L: (k->dir) = TURN_LEFT(k->dir); (k->y)++; break;
+        case L: (k->dir) = TURN_LEFT(k->dir); break;
           // go left
-        case D: (k->dir) = TURN_RIGHT(k->dir); (k->x)--; break;
+        case D: (k->dir) = TURN_RIGHT(k->dir); break;
           // moving right FROM LEFT, go up
-        case R: (k->dir) = TURN_LEFT(k->dir); (k->y)--; break;
+        case R: (k->dir) = TURN_LEFT(k->dir); break;
         }
         break;
 
       case '\\':
         switch (k->dir) {
           // gg left
-        case U: (k->dir) = TURN_LEFT(k->dir); (k->x)--; break;
+        case U: (k->dir) = TURN_LEFT(k->dir); break;
           // moving left FROM RIGHT, go up
-        case L: (k->dir) = TURN_RIGHT(k->dir); (k->y)--; break;
+        case L: (k->dir) = TURN_RIGHT(k->dir); break;
           // go right
-        case D: (k->dir) = TURN_LEFT(k->dir); (k->x)++; break;
+        case D: (k->dir) = TURN_LEFT(k->dir); break;
           // go down
-        case R: (k->dir) = TURN_RIGHT(k->dir); (k->y)++; break;
+        case R: (k->dir) = TURN_RIGHT(k->dir); break;
         }
         break;
 
       case '+':
         switch (k->turn) {
         case LEFT: (k->dir) = TURN_LEFT(k->dir); break;
-        case STRAIGHT: break;
         case RIGHT: (k->dir) = TURN_RIGHT(k->dir); break;
+        case STRAIGHT: break;
         }
         (k->turn) = NEXT_INTERSECTION_TURN(k->turn);
-
-        switch (k->dir) {
-        case U: (k->y)--; break;
-        case D: (k->y)++; break;
-        case L: (k->x)--; break;
-        case R: (k->x)++; break;
-        }
         break;
-      } // end switch(cur)
+
+      default:
+        break;
+      }
 
       continue;
 
