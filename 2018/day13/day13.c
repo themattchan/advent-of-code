@@ -240,7 +240,7 @@ main(int argc, char * argv[])
     // actually parse it
     int x = 0;
     int y = 0;
-    int cur_cart = 0;
+    int k = 0;
     while ((c = getc(fp)) != EOF) {
       if (c =='\n') {
         for (; x < WIDTH; ++x) MAP(x,y) = ' ';
@@ -250,22 +250,22 @@ main(int argc, char * argv[])
       else {
         switch (c) {
         case '<':
-          make_cart(&carts[cur_cart++], x, y, L);
+          make_cart(&carts[k++], x, y, L);
           MAP(x,y) = '-';
           break;
 
         case '>':
-          make_cart(&carts[cur_cart++], x, y, R);
+          make_cart(&carts[k++], x, y, R);
           MAP(x,y) = '-';
           break;
 
         case '^':
-          make_cart(&carts[cur_cart++], x, y, U);
+          make_cart(&carts[k++], x, y, U);
           MAP(x,y) = '|';
           break;
 
         case 'v':
-          make_cart(&carts[cur_cart++], x, y, D);
+          make_cart(&carts[k++], x, y, D);
           MAP(x,y) = '|';
           break;
 
