@@ -145,7 +145,7 @@ check_collision2(int k)
         kx == carts[i].x &&
         ky == carts[i].y)
       {
-        printf("collision at %d,%d, carts removed\n\n", kx, ky);
+        printf("collision at %d,%d\n\n", kx, ky);
         carts[k].active = false;
         carts[i].active = false;
         return true;
@@ -206,7 +206,7 @@ print_carts_state()
 {
   printf("There are %d carts\n", NUM_CARTS);
   for (int i = 0; i < NUM_CARTS; ++i) {
-    printf("Cart %d: active=%d, x=%d, y=%d, dir=%s\n", i, carts[i].active, carts[i].x, carts[i].y, print_dir(carts[i].dir));
+    printf("Cart %3d: active=%d, x=%3d, y=%3d, dir=%s\n", i, carts[i].active, carts[i].x, carts[i].y, print_dir(carts[i].dir));
   }
   putchar('\n');
 }
@@ -282,8 +282,8 @@ main(int argc, char * argv[])
     fclose(fp);
   }
 
-  print_state();
-  print_carts_state();
+  //  print_state();
+  // print_carts_state();
 
   while (1) {
     //    print_state();
