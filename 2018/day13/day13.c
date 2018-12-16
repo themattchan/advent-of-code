@@ -76,7 +76,6 @@ cart
 {
   int x;
   int y;
-  bool has_turned;
   Dir dir;
   Turn turn;
   bool active;
@@ -87,7 +86,6 @@ make_cart(struct cart * cart, int x, int y, Dir d)
 {
   cart->x = x;
   cart->y = y;
-  cart->has_turned = false;
   cart->dir = d;
   cart->turn = LEFT;
   cart->active = true;
