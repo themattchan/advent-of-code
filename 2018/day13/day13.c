@@ -1,7 +1,8 @@
-#include <stdlib.h>
-#include <stdio.h>
+#include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 //
 // globals
@@ -113,7 +114,7 @@ check_collision(struct cart *carts)
     if (carts[i].x == carts[i+1].x &&
         carts[i].y == carts[i+1].y)
       {
-        printf("collision at %d,%d\n", carts[i].x, carts[i].y);
+        printf("collision at %d,%d\n\n", carts[i].x, carts[i].y);
         return true;
       }
   }
@@ -129,7 +130,7 @@ print_cart(struct cart * k)
 {
   switch (k->dir) {
   case U: putchar('^'); break;
-  case D: putchar('V'); break;
+  case D: putchar('v'); break;
   case L: putchar('<'); break;
   case R: putchar('>'); break;
   }
@@ -165,15 +166,16 @@ print_map()
     putchar('\n');
   }
   putchar('\n');
-
 }
 
 void
 print_carts_state()
 {
+  printf("There are %d carts\n", NUM_CARTS);
   for (int i = 0; i < NUM_CARTS; ++i) {
     printf("Cart %d: x=%d, y=%d, dir=%s\n", i, carts[i].x, carts[i].y, print_dir(carts[i].dir));
   }
+  putchar('\n');
 }
 
 int
@@ -193,7 +195,7 @@ main(int argc, char * argv[])
         widthl = 0;
       }
       else {
-        if (c == '<' || c == '>' || c == '^' || c == 'V')
+        if (c == '<' || c == '>' || c == '^' || c == 'v')
           NUM_CARTS++;
         widthl++;
       }
@@ -231,7 +233,7 @@ main(int argc, char * argv[])
           MAP(x,y) = '|';
           break;
 
-        case 'V':
+        case 'v':
           make_cart(&carts[cur_cart++], x, y, D);
           MAP(x,y) = '|';
           break;
@@ -243,13 +245,15 @@ main(int argc, char * argv[])
         x++;
       }
     }
+    assert(y==HEIGHT);
     fclose(fp);
   }
 
   print_state();
+  print_carts_state();
 
   while (1) {
-    //    print_state();
+    //print_state();
 
     sort_carts(carts);
 
