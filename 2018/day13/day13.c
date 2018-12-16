@@ -28,8 +28,8 @@ struct cart * carts = NULL;
 #define D 2
 #define L 3
 
-#define TURN_RIGHT(x) ((((x)+1)%4))
-#define TURN_LEFT(x) ((((x-1)+4)%4))
+#define TURN_RIGHT(x) (x=(((x)+1)%4))
+#define TURN_LEFT(x) (x=(((x-1)+4)%4))
 
 typedef char Dir;
 
@@ -52,7 +52,7 @@ print_dir(Dir d)
 #define LEFT 0
 #define STRAIGHT 1
 #define RIGHT 2
-#define NEXT_INTERSECTION_TURN(x) ((((x)+1)%3))
+#define NEXT_INTERSECTION_TURN(x) (x=(((x)+1)%3))
 
 typedef char Turn;
 
@@ -306,16 +306,16 @@ main(int argc, char * argv[])
       switch (cur) {
       case '|':
         switch (k->dir) {
-        case U: (k->y)--; break;
-        case D: (k->y)++; break;
+        case U: k->y--; break;
+        case D: k->y++; break;
         default: goto fail;
         }
         break;
 
       case '-':
         switch (k->dir) {
-        case L: (k->x)--; break;
-        case R: (k->x)++; break;
+        case L: k->x--; break;
+        case R: k->x++; break;
         default: goto fail;
         }
         break;
@@ -324,10 +324,10 @@ main(int argc, char * argv[])
       case '\\':
       case '+':
         switch (k->dir) {
-        case U: (k->y)--; break;
-        case L: (k->x)--; break;
-        case D: (k->y)++; break;
-        case R: (k->x)++; break;
+        case U: k->y--; break;
+        case L: k->x--; break;
+        case D: k->y++; break;
+        case R: k->x++; break;
         }
         break;
       } // end switch(cur)
@@ -341,36 +341,36 @@ main(int argc, char * argv[])
       case '/':
         switch (k->dir) {
           // moving up, go right
-        case U: (k->dir) = TURN_RIGHT(k->dir); break;
+        case U: TURN_RIGHT(k->dir); break;
           // moving left FROM RIGHT, go down
-        case L: (k->dir) = TURN_LEFT(k->dir); break;
+        case L: TURN_LEFT(k->dir); break;
           // go left
-        case D: (k->dir) = TURN_RIGHT(k->dir); break;
+        case D: TURN_RIGHT(k->dir); break;
           // moving right FROM LEFT, go up
-        case R: (k->dir) = TURN_LEFT(k->dir); break;
+        case R: TURN_LEFT(k->dir); break;
         }
         break;
 
       case '\\':
         switch (k->dir) {
           // gg left
-        case U: (k->dir) = TURN_LEFT(k->dir); break;
+        case U: TURN_LEFT(k->dir); break;
           // moving left FROM RIGHT, go up
-        case L: (k->dir) = TURN_RIGHT(k->dir); break;
+        case L: TURN_RIGHT(k->dir); break;
           // go right
-        case D: (k->dir) = TURN_LEFT(k->dir); break;
+        case D: TURN_LEFT(k->dir); break;
           // go down
-        case R: (k->dir) = TURN_RIGHT(k->dir); break;
+        case R: TURN_RIGHT(k->dir); break;
         }
         break;
 
       case '+':
         switch (k->turn) {
-        case LEFT: (k->dir) = TURN_LEFT(k->dir); break;
-        case RIGHT: (k->dir) = TURN_RIGHT(k->dir); break;
+        case LEFT: TURN_LEFT(k->dir); break;
+        case RIGHT: TURN_RIGHT(k->dir); break;
         case STRAIGHT: break;
         }
-        (k->turn) = NEXT_INTERSECTION_TURN(k->turn);
+        NEXT_INTERSECTION_TURN(k->turn);
         break;
 
       default:
