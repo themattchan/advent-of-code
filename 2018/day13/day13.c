@@ -15,7 +15,7 @@ char *map = NULL;
 struct cart * carts = NULL;
 
 // char MAP(int,int)
-#define MAP(x,y) (map[(y*HEIGHT)+x])
+#define MAP(x,y) (map[(y*WIDTH)+x])
 
 
 //
@@ -246,8 +246,10 @@ main(int argc, char * argv[])
     fclose(fp);
   }
 
+  print_state();
+
   while (1) {
-    print_state();
+    //    print_state();
 
     sort_carts(carts);
 
