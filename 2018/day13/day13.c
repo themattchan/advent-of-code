@@ -115,13 +115,41 @@ bool check_collision(struct cart *carts)
 // main
 //
 
-int main ()
+void print_cart(struct cart * k) {
+  switch (k->dir) {
+  case U: putchar('^'); break;
+  case D: putchar('V'); break;
+  case L: putchar('<'); break;
+  case R: putchar('>'); break;
+  }
+}
+
+void print_state ()
+{
+    for (int y = 0; y < HEIGHT; ++y) {
+      for (int x = 0; x < WIDTH; ++x) {
+        bool is_cart = false;
+        for (int k = 0; k < NUM_CARTS; ++k) {
+          if (carts[k].x == x && carts[k].y == y) {
+            is_cart = true;
+            print_cart(&carts[k]);
+          }
+        }
+        if (! is_cart)
+          putchar(MAP(x, y));
+      }
+      putchar('\n');
+  }
+    putchar('\n');
+}
+
+int main (int argc, char * argv[])
 {
   // input parsing
   {
     FILE *fp;
     // preprocessing
-    fp = fopen("input", "r");
+    fp = fopen((argc > 1 ? argv[1] : "input"), "r");
     char c;
     int widthl = 0;
     while ((c = getc(fp)) != EOF) {
@@ -196,6 +224,8 @@ int main ()
    * } */
 
   while (1) {
+    print_state();
+
     sort_carts(carts);
 
     if (check_collision(carts)) break;
@@ -267,11 +297,16 @@ int main ()
 
 
     fail:
-      printf("Invalid move: cart[%d] at (%d,%d) going %s but map piece is %c\n", i, k->x,k->y, print_dir(k->dir), cur);
+      fprintf(stderr, "Invalid move: cart[%d] at (%d,%d) going %s but map piece is %c\n", i, k->x, k->y, print_dir(k->dir), cur);
       return EXIT_FAILURE;
 
     } // end for(k in carts)
+
   } // end while(1)
+
+  for (int i = 0; i < NUM_CARTS; ++i) {
+    printf("Cart %d: x=%d, y=%d, dir=%s\n", i, carts[i].x, carts[i].y, print_dir(carts[i].dir));
+  }
 
   free(map);
   free(carts);
