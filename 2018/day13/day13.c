@@ -79,6 +79,7 @@ cart
   bool has_turned;
   Dir dir;
   Turn turn;
+  bool active;
 };
 
 inline void
@@ -89,6 +90,7 @@ make_cart(struct cart * cart, int x, int y, Dir d)
   cart->has_turned = false;
   cart->dir = d;
   cart->turn = LEFT;
+  cart->active = true;
 }
 
 // return -1 if c1p comes first, 0 if equal, 1 if c2p comes first
@@ -98,9 +100,14 @@ sort_carts_cmp(const void * c1p, const void * c2p)
   struct cart * c1 = (struct cart *) c1p;
   struct cart * c2 = (struct cart *) c2p;
 
-  int dy = (c1->y) - (c2->y);
-  if (dy == 0) return (c1->x) - (c2->x);
-  else return dy;
+  if (!c1->active && !c2->active) return 0;
+  else if (! c1->active) return 1;
+  else if (! c2->active) return -1;
+  else {
+    int dy = (c1->y) - (c2->y);
+    if (dy == 0) return (c1->x) - (c2->x);
+    else return dy;
+  }
 }
 
 inline void
@@ -120,6 +127,27 @@ check_collision(int k)
         ky == carts[i].y)
       {
         printf("collision at %d,%d\n\n", kx, ky);
+        return true;
+      }
+  }
+  return false;
+}
+
+bool
+check_collision2(int k)
+{
+  for (int i = 0; i < NUM_CARTS; ++i) {
+    int kx = carts[k].x;
+    int ky = carts[k].y;
+    if (k != i &&
+        carts[k].active &&
+        carts[i].active &&
+        kx == carts[i].x &&
+        ky == carts[i].y)
+      {
+        printf("collision at %d,%d, carts removed\n\n", kx, ky);
+        carts[k].active = false;
+        carts[i].active = false;
         return true;
       }
   }
@@ -178,7 +206,7 @@ print_carts_state()
 {
   printf("There are %d carts\n", NUM_CARTS);
   for (int i = 0; i < NUM_CARTS; ++i) {
-    printf("Cart %d: x=%d, y=%d, dir=%s\n", i, carts[i].x, carts[i].y, print_dir(carts[i].dir));
+    printf("Cart %d: active=%d, x=%d, y=%d, dir=%s\n", i, carts[i].active, carts[i].x, carts[i].y, print_dir(carts[i].dir));
   }
   putchar('\n');
 }
@@ -261,9 +289,15 @@ main(int argc, char * argv[])
     //    print_state();
 
     sort_carts(carts);
+    // after removing all colliding pairs one will remain at carts[0]
+    if (carts[0].active && !carts[1].active) {
+      printf("last cart at: %d,%d\n\n", carts[0].x, carts[0].y);
+      goto done;
+    }
 
     for (int i = 0; i < NUM_CARTS; ++i) {
       struct cart * k = &carts[i];
+      if (! k->active) continue;
 
       char cur;
 
@@ -298,7 +332,8 @@ main(int argc, char * argv[])
         break;
       } // end switch(cur)
 
-      if (check_collision(i)) goto done;
+      //      if (check_collision(i)) goto done;
+      if (check_collision2(i)) continue;
 
       // try turn
       cur = MAP(k->x, k->y);
