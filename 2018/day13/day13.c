@@ -31,7 +31,8 @@ struct cart * carts = NULL;
 
 typedef char Dir;
 
-const char * print_dir(Dir d)
+const char *
+print_dir(Dir d)
 {
   switch (d) {
   case U: return "UP";
@@ -39,6 +40,7 @@ const char * print_dir(Dir d)
   case L: return "LEFT";
   case R: return "RIGHT";
   }
+  return NULL;
 }
 
 //
@@ -52,20 +54,23 @@ const char * print_dir(Dir d)
 
 typedef char Turn;
 
-const char * print_turn(Turn d)
+const char *
+print_turn(Turn d)
 {
   switch (d) {
   case LEFT: return "LEFT";
   case STRAIGHT: return "STRAIGHT";
   case RIGHT: return "RIGHT";
   }
+  return NULL;
 }
 
 //
 // carts
 //
 
-struct cart
+struct
+cart
 {
   int x;
   int y;
@@ -73,7 +78,8 @@ struct cart
   Turn turn;
 };
 
-inline void make_cart(struct cart * cart, int x, int y, Dir d)
+inline void
+make_cart(struct cart * cart, int x, int y, Dir d)
 {
   cart->x = x;
   cart->y = y;
@@ -82,7 +88,8 @@ inline void make_cart(struct cart * cart, int x, int y, Dir d)
 }
 
 // return -1 if c1p comes first, 0 if equal, 1 if c2p comes first
-int sort_carts_cmp(const void * c1p, const void * c2p)
+int
+sort_carts_cmp(const void * c1p, const void * c2p)
 {
   struct cart * c1 = (struct cart *) c1p;
   struct cart * c2 = (struct cart *) c2p;
@@ -92,13 +99,15 @@ int sort_carts_cmp(const void * c1p, const void * c2p)
   else return dy;
 }
 
-inline void sort_carts(struct cart * carts)
+inline void
+sort_carts(struct cart * carts)
 {
   qsort((void*)carts, NUM_CARTS, sizeof(struct cart), sort_carts_cmp);
 }
 
 // INPUT: a sorted carts array
-bool check_collision(struct cart *carts)
+bool
+check_collision(struct cart *carts)
 {
   for (int i = 0; i < NUM_CARTS-1; ++i) {
     if (carts[i].x == carts[i+1].x &&
@@ -115,7 +124,9 @@ bool check_collision(struct cart *carts)
 // main
 //
 
-void print_cart(struct cart * k) {
+void
+print_cart(struct cart * k)
+{
   switch (k->dir) {
   case U: putchar('^'); break;
   case D: putchar('V'); break;
@@ -124,7 +135,8 @@ void print_cart(struct cart * k) {
   }
 }
 
-void print_state ()
+void
+print_state()
 {
     for (int y = 0; y < HEIGHT; ++y) {
       for (int x = 0; x < WIDTH; ++x) {
@@ -143,7 +155,29 @@ void print_state ()
     putchar('\n');
 }
 
-int main (int argc, char * argv[])
+void
+print_map()
+{
+  for (int i = 0; i < HEIGHT; ++i) {
+    for (int j = 0; j < WIDTH; ++j) {
+      putchar(MAP(j,i));
+    }
+    putchar('\n');
+  }
+  putchar('\n');
+
+}
+
+void
+print_carts_state()
+{
+  for (int i = 0; i < NUM_CARTS; ++i) {
+    printf("Cart %d: x=%d, y=%d, dir=%s\n", i, carts[i].x, carts[i].y, print_dir(carts[i].dir));
+  }
+}
+
+int
+main(int argc, char * argv[])
 {
   // input parsing
   {
@@ -211,17 +245,6 @@ int main (int argc, char * argv[])
     }
     fclose(fp);
   }
-
-  /* for (int i = 0; i < NUM_CARTS; ++i) {
-   *   printf("Cart %d: x=%d, y=%d, dir=%d\n", i, carts[i].x, carts[i].y, carts[i].dir);
-   * } */
-
-  /* for (int i = 0; i < HEIGHT; ++i) {
-   *   for (int j = 0; j < WIDTH; ++j) {
-   *     putchar(MAP(j,i));
-   *   }
-   *   putchar('\n');
-   * } */
 
   while (1) {
     print_state();
@@ -304,9 +327,7 @@ int main (int argc, char * argv[])
 
   } // end while(1)
 
-  for (int i = 0; i < NUM_CARTS; ++i) {
-    printf("Cart %d: x=%d, y=%d, dir=%s\n", i, carts[i].x, carts[i].y, print_dir(carts[i].dir));
-  }
+  print_carts_state();
 
   free(map);
   free(carts);
