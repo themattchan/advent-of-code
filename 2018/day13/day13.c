@@ -139,29 +139,29 @@ print_cart(struct cart * k)
 void
 print_state()
 {
-    for (int y = 0; y < HEIGHT; ++y) {
-      for (int x = 0; x < WIDTH; ++x) {
-        bool is_cart = false;
-        for (int k = 0; k < NUM_CARTS; ++k) {
-          if (carts[k].x == x && carts[k].y == y) {
-            is_cart = true;
-            print_cart(&carts[k]);
-          }
+  for (int y = 0; y < HEIGHT; ++y) {
+    for (int x = 0; x < WIDTH; ++x) {
+      bool is_cart = false;
+      for (int k = 0; k < NUM_CARTS; ++k) {
+        if (carts[k].x == x && carts[k].y == y) {
+          is_cart = true;
+          print_cart(&carts[k]);
         }
-        if (! is_cart)
-          putchar(MAP(x, y));
       }
-      putchar('\n');
-  }
+      if (! is_cart)
+        putchar(MAP(x, y));
+    }
     putchar('\n');
+  }
+  putchar('\n');
 }
 
 void
 print_map()
 {
-  for (int i = 0; i < HEIGHT; ++i) {
-    for (int j = 0; j < WIDTH; ++j) {
-      putchar(MAP(j,i));
+  for (int y = 0; y < HEIGHT; ++y) {
+    for (int x = 0; x < WIDTH; ++x) {
+      putchar(MAP(x,y));
     }
     putchar('\n');
   }
