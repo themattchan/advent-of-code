@@ -283,7 +283,7 @@ main(int argc, char * argv[])
   //  print_state();
   // print_carts_state();
 
-  while (1) {
+  while (true) {
     //    print_state();
 
     sort_carts(carts);
