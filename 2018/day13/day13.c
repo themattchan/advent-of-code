@@ -347,6 +347,8 @@ main(int argc, char * argv[])
 
     fail:
       fprintf(stderr, "Invalid move: cart[%d] at (%d,%d) going %s but map piece is %c\n", i, k->x, k->y, print_dir(k->dir), cur);
+      free(map);
+      free(carts);
       return EXIT_FAILURE;
 
     } // end for(k in carts)
