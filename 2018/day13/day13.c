@@ -109,15 +109,17 @@ sort_carts(struct cart * carts)
   qsort((void*)carts, NUM_CARTS, sizeof(struct cart), sort_carts_cmp);
 }
 
-// INPUT: a sorted carts array
 bool
-check_collision(struct cart *carts)
+check_collision(int k)
 {
-  for (int i = 0; i < NUM_CARTS-1; ++i) {
-    if (carts[i].x == carts[i+1].x &&
-        carts[i].y == carts[i+1].y)
+  for (int i = 0; i < NUM_CARTS; ++i) {
+    int kx = carts[k].x;
+    int ky = carts[k].y;
+    if (k != i &&
+        kx == carts[i].x &&
+        ky == carts[i].y)
       {
-        printf("collision at %d,%d\n\n", carts[i].x, carts[i].y);
+        printf("collision at %d,%d\n\n", kx, ky);
         return true;
       }
   }
@@ -256,11 +258,9 @@ main(int argc, char * argv[])
   print_carts_state();
 
   while (1) {
-    print_state();
+    //    print_state();
 
     sort_carts(carts);
-
-    if (check_collision(carts)) break;
 
     for (int i = 0; i < NUM_CARTS; ++i) {
       struct cart * k = &carts[i];
@@ -297,6 +297,8 @@ main(int argc, char * argv[])
         }
         break;
       } // end switch(cur)
+
+      if (check_collision(i)) goto done;
 
       // try turn
       cur = MAP(k->x, k->y);
@@ -351,6 +353,7 @@ main(int argc, char * argv[])
 
   } // end while(1)
 
+ done:
   print_carts_state();
 
   free(map);
