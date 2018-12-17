@@ -287,6 +287,10 @@ main(int argc, char * argv[])
     //    print_state();
 
     sort_carts(carts);
+    if (!carts[0].active) {
+      printf("no more carts\n\n");
+      goto done;
+    }
     // after removing all colliding pairs one will remain at carts[0]
     if (carts[0].active && !carts[1].active) {
       printf("last cart at: %d,%d\n\n", carts[0].x, carts[0].y);
