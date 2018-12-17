@@ -121,23 +121,6 @@ check_collision(int k)
     int kx = carts[k].x;
     int ky = carts[k].y;
     if (k != i &&
-        kx == carts[i].x &&
-        ky == carts[i].y)
-      {
-        printf("collision at %d,%d\n\n", kx, ky);
-        return true;
-      }
-  }
-  return false;
-}
-
-bool
-check_collision2(int k)
-{
-  for (int i = 0; i < NUM_CARTS; ++i) {
-    int kx = carts[k].x;
-    int ky = carts[k].y;
-    if (k != i &&
         carts[k].active &&
         carts[i].active &&
         kx == carts[i].x &&
@@ -334,8 +317,7 @@ main(int argc, char * argv[])
         break;
       } // end switch(cur)
 
-      //      if (check_collision(i)) goto done;
-      if (check_collision2(i)) continue;
+      if (check_collision(i)) continue; // goto done;
 
       // try turn
       cur = MAP(k->x, k->y);
