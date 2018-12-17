@@ -34,23 +34,6 @@ whichbit(u_int16_t bv)
   return ret;
 }
 
-bool
-check_array(int expect[4], int actual[4])
-{
-  for (int i = 0; i < 4; ++i) {
-    if (expect[i] != actual[i])
-      return false;
-  }
-  return true;
-}
-
-void
-init_array(int from[4], int to[4])
-{
-  for (int i = 0; i < 4; ++i)
-    to[i] = from[i];
-}
-
 void
 do_op_proper(int op[4], int reg[4])
 {
@@ -136,24 +119,28 @@ do_op_proper(int op[4], int reg[4])
 
 // there are 16 opcodes
 int
-try_op(u_int16_t which_one[16], int before[4], int op[4], int after[4])
+try_op(u_int16_t which_one[16], const int before[4], int op[4], const int after[4])
 {
   int count = 0;
   int actualOp = op[0];
 
-  int reg[4];
   for (int opNum = 0; opNum < 16; ++opNum) {
     op[0] = opNum;
 
-    init_array(before, reg);
+    int reg[4] = { before[0], before[1], before[2], before[3] };
+
     do_op_proper(op, reg);
-    bool ret = check_array(after, reg);
-    count += ret;
-    if (!ret && !(ispow2(which_one[actualOp]))) {
+
+    bool same = true;
+    for (int i = 0; i < 4; ++i)
+      if (after[i] != reg[i])
+        same = false;
+
+    count += same;
+    if (!same && !(ispow2(which_one[actualOp]))) {
       unsetbit(which_one[actualOp], opNum);
     }
   }
-
   return count;
 }
 
