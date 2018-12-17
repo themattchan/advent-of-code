@@ -157,7 +157,8 @@ try_op(u_int16_t which_one[16], int before[4], int op[4], int after[4])
   return count;
 }
 
-void resolve(u_int16_t which_one[16]) {
+void
+resolve(u_int16_t which_one[16]) {
   int todo = 0;
   for (int i = 0; i < 16; ++i)
     if (! isPow2(which_one[i]))
