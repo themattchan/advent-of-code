@@ -233,7 +233,7 @@ main()
     }
   }
 
-  printf("More than 3: %d\n", more_than_3);
+  printf("More than 3: %d\n\n", more_than_3);
 
   resolve(which_one);
 
@@ -243,6 +243,7 @@ main()
     bin16(which_one[i], bin);
     printf("%3d --> %3d (0x%s)\n", i, whichbit(which_one[i]), bin);
   }
+  putchar('\n');
 
   int reg[4] = {0};
   int instr = 0;
@@ -251,10 +252,11 @@ main()
     int ret = fscanf(fp, "%d %d %d %d\n", &op[0], &op[1], &op[2], &op[3]);
     if (ret != 4) fprintf(stderr, "could not parse input");
 
-    printf("%d %d %d %d\n", op[0],op[1],op[2],op[3]);
+    //  printf("%d %d %d %d\n", op[0],op[1],op[2],op[3]);
     op[0] = whichbit(which_one[op[0]]); // translate to proper op
     do_op_proper(op, reg);
   }
+
   printf("test program finished, executed %d instructions\n", instr);
   printf("registers are:\n");
   for (int i = 0; i < 4; ++i)
