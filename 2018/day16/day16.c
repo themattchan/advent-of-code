@@ -9,7 +9,7 @@
 #define unsetbit(bv, bit) (bv &= ~(1 << bit))
 #define testbit(bv, bit) ((bv >> i) & 1)
 
-#define isPow2(x) ((((x) != 0) && (((x) & (x)-1) == 0)))
+#define ispow2(x) ((((x) != 0) && (((x) & (x)-1) == 0)))
 
 #define DEBUG 0
 
@@ -24,7 +24,7 @@ bin16(u_int16_t bv, char bin[16])
 int
 whichbit(u_int16_t bv)
 {
-  if (! isPow2(bv)) return -1; // more than 1 bit on
+  if (! ispow2(bv)) return -1; // more than 1 bit on
   u_int16_t i = 1;
   int ret = 0;
   while (! (i&bv)) {
@@ -149,7 +149,7 @@ try_op(u_int16_t which_one[16], int before[4], int op[4], int after[4])
     do_op_proper(op, reg);
     bool ret = check_array(after, reg);
     count += ret;
-    if (!ret && !(isPow2(which_one[actualOp]))) {
+    if (!ret && !(ispow2(which_one[actualOp]))) {
       unsetbit(which_one[actualOp], opNum);
     }
   }
@@ -161,7 +161,7 @@ void
 resolve(u_int16_t which_one[16]) {
   int todo = 0;
   for (int i = 0; i < 16; ++i)
-    if (! isPow2(which_one[i]))
+    if (! ispow2(which_one[i]))
       todo++;
 
   while (todo) {
@@ -175,7 +175,7 @@ resolve(u_int16_t which_one[16]) {
 #endif
 
     for (int i = 0; i < 16; ++i) {
-      if (! isPow2(which_one[i])) {
+      if (! ispow2(which_one[i])) {
         u_int16_t tryclr = which_one[i];
         for (int j = 0; j < 16; ++j)
           if (j != i && which_one[j] != 0)
@@ -183,10 +183,10 @@ resolve(u_int16_t which_one[16]) {
 #if DEBUG
         char bin[17] = {0};
         bin16(tryclr, bin);
-        printf("%3d --> 0x%s isPow2=%d\n", i, bin, isPow2(tryclr));
+        printf("%3d --> 0x%s ispow2=%d\n", i, bin, ispow2(tryclr));
 #endif
 
-        if (isPow2(tryclr)) {
+        if (ispow2(tryclr)) {
           todo--;
           which_one[i] = tryclr;
         }
