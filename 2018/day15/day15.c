@@ -155,6 +155,12 @@ clear_reachable()
     memset(REACHABLE, 0, REACHABLE_SIZE*sizeof(u_int64_t));
 }
 
+inline void
+free_reachable()
+{
+  free(REACHABLE);
+}
+
 void
 flood_fill(int x, int y)
 {
@@ -277,6 +283,7 @@ main(int argc, char * argv[])
   } // while true
 
  done:
+  free_reachable();
   free(GS);
   free(ES);
   free(units);
