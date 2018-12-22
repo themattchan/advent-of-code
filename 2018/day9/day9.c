@@ -93,7 +93,7 @@ void print_buf(node* n)
 {
   node* cur = n;
   do {
-    //    printf("%d ", cur->n);
+    printf("%d ", cur->n);
     cur = cur->fwd;
   } while (cur != n);
 }
