@@ -26,13 +26,11 @@ node* singleton(int n)
 // stick new node in front of a node, return new node
 node * grow(int n, node * before)
 {
-  node * new = (node*)malloc(sizeof(node));
-
   // skip one if possible
   if (before->fwd !=before)
     before=before->fwd;
 
-  new->n = n;
+  node * new = singleton(n);
 
   new->fwd = before->fwd;
   new->bwd = before;
