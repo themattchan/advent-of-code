@@ -143,22 +143,14 @@ R doit(int players, int hi)
 }
 
 int
-main(int argc, char * argv[])
+main()
 {
   int elfs, hi;
 
-  if (argc == 1) {
-    FILE *fp;
-    fp = fopen("input", "r");
-    fscanf(fp, "%d players; last marble is worth %d points", &elfs, &hi);
-    fclose(fp);
-  } else if (argc == 3) {
-    elfs = atoi(argv[1]);
-    hi = atoi(argv[2]);
-  } else {
-    return EXIT_FAILURE;
-  }
-
+  FILE *fp;
+  fp = fopen("input", "r");
+  fscanf(fp, "%d players; last marble is worth %d points", &elfs, &hi);
+  fclose(fp);
 
   {
     R _res;
