@@ -4,8 +4,6 @@
 #define INPUT 681901
 #define SIZE (INPUT*100) // INPUT+10
 
-#define M(i,n) ((buf[x+i]==n))
-
 typedef unsigned char D;
 
 int main ()
@@ -37,12 +35,14 @@ int main ()
   for (int i = INPUT; i < INPUT+10; ++i) putchar(buf[i] + '0');
   putchar('\n');
 
+#define M(i,n) ((buf[x+i]==n))
   for (int x = 0; x < SIZE; ++x) {
     if (M(0,6) && M(1,8) && M(2,1) && M(3,9) && M(4,0) && M(5,1)) {
       printf("part2: %d\n",x);
       break;
     }
   }
+#undef M
 
   free(buf);
   return 0;

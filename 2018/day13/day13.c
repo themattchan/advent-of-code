@@ -305,6 +305,7 @@ main(int argc, char * argv[])
         }
         break;
 
+	// direction has been switched on previous iteration; see below
       case '/':
       case '\\':
       case '+':
