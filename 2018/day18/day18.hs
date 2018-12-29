@@ -105,8 +105,14 @@ main = do
 --  traverse_ (putStrLn . pt) (take 11 (doit i))
   print (solve 10 (doit i))
 
-  -- first10 <- traverse (\n -> doit2 n i) [0..1]
-  -- print $ "doit == doit2: " <> show (take 2 (doit i) == first10)
+  first10 <- traverse (\n -> doit2 n i) [0..1]
+  putStrLn "================================================================================"
+  putStrLn "GOOD: "
+  traverse_ (putStrLn . pt) (take 2 (doit i))
+  putStrLn "================================================================================"
+  putStrLn "BAD: "
+  traverse_ (putStrLn. pt) first10
+  print $ "doit == doit2: " <> show (map pt (take 2 (doit i)) == map pt first10)
 
   doit2 10 i >>= print . score
   doit2 1000000000 i >>= print . score
