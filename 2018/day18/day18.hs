@@ -71,10 +71,10 @@ doit2 n seed = do
     let expand ix = let (y,x) = ix `divMod` hiX in (y+1, x+1)
     let fbnds = (flatten lo, flatten hi)
 
-    putStrLn $ "expand-flatten inverse1 : "<> show (map expand (Ix.range fbnds) == Ix.range bnds)
-    putStrLn $ "expand-flatten inverse2 : "<> show (map flatten (Ix.range bnds) == Ix.range fbnds)
-    putStrLn $ "expand-flatten inverse3 : "<> show (A.ixmap bnds flatten (A.ixmap fbnds expand seed) == seed)
-    putStrLn $ "expand-flatten inverse4 : "<> show (map (neighbours bnds . expand) (Ix.range fbnds) == map (neighbours bnds) (Ix.range bnds))
+    -- putStrLn $ "expand-flatten inverse1 : "<> show (map expand (Ix.range fbnds) == Ix.range bnds)
+    -- putStrLn $ "expand-flatten inverse2 : "<> show (map flatten (Ix.range bnds) == Ix.range fbnds)
+    -- putStrLn $ "expand-flatten inverse3 : "<> show (A.ixmap bnds flatten (A.ixmap fbnds expand seed) == seed)
+    -- putStrLn $ "expand-flatten inverse4 : "<> show (map (neighbours bnds . expand) (Ix.range fbnds) == map (neighbours bnds) (Ix.range bnds))
 
     old :: MA.IOUArray Int Char <- MA.thaw $ A.ixmap fbnds expand seed -- MA.newListArray bnds as
     new :: MA.IOUArray Int Char <- MA.newArray_ fbnds
@@ -89,7 +89,7 @@ doit2 n seed = do
     let go !n old new
           | n == 0 = pure old
           | otherwise = do
-              for_ fbnds $ \ix ->
+              for_ (Ix.range fbnds) $ \ix ->
                 readMA old ix
                   >>= moveIO bnds old ix
                   >>= writeMA new ix
@@ -105,14 +105,14 @@ main = do
 --  traverse_ (putStrLn . pt) (take 11 (doit i))
   print (solve 10 (doit i))
 
-  first10 <- traverse (\n -> doit2 n i) [0..1]
-  putStrLn "================================================================================"
-  putStrLn "GOOD: "
-  traverse_ (putStrLn . pt) (take 2 (doit i))
-  putStrLn "================================================================================"
-  putStrLn "BAD: "
-  traverse_ (putStrLn. pt) first10
-  print $ "doit == doit2: " <> show (map pt (take 2 (doit i)) == map pt first10)
+  -- first10 <- traverse (\n -> doit2 n i) [0..1]
+  -- putStrLn "================================================================================"
+  -- putStrLn "GOOD: "
+  -- traverse_ (putStrLn . pt) (take 2 (doit i))
+  -- putStrLn "================================================================================"
+  -- putStrLn "BAD: "
+  -- traverse_ (putStrLn. pt) first10
+  -- print $ "doit == doit2: " <> show (map pt (take 2 (doit i)) == map pt first10)
 
   doit2 10 i >>= print . score
   doit2 1000000000 i >>= print . score
