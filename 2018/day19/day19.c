@@ -1,5 +1,20 @@
 #include "../register.h"
 
+int IP_REG = 0;
+
+void doit(int lines, int prog[][4], int reg[]) {
+  int ip = 0;
+  while (ip >= 0 && ip < lines) {
+    reg[IP_REG] = ip;
+    do_op_proper(prog[ip], reg);
+    ip = reg[IP_REG];
+    ip++;
+  }
+  printf("registers are:\n");
+  for (int i = 0; i < 4; ++i)
+    printf("reg[%d]=%d\n", i, reg[i]);
+}
+
 int main()
 {
   FILE *fp;
@@ -10,8 +25,7 @@ int main()
   lines--; // skip #ip
 
   rewind(fp);
-  int ip;
-  fscanf(fp, "#ip %d\n", &ip);
+  fscanf(fp, "#ip %d\n", &IP_REG);
 
   int reg[6] = {0};
   int prog[lines][4];
@@ -23,6 +37,13 @@ int main()
     prog[line][0] = op_s2i(opname);
     line++;
   }
-  do_op_proper();
+  fclose(fp);
 
+  doit(lines,prog,reg);
+
+  /* for (int i = 0; i < 6; i++) reg[i]=0;
+   * reg[0] = 1;
+   * doit(lines,prog,reg); */
+
+  return EXIT_SUCCESS;
 }

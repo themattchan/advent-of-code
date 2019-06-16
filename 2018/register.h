@@ -37,32 +37,31 @@ whichbit(u_int16_t bv)
   return ret;
 }
 
-typedef struct { char *k, int v } opcode_kv_t;
-static opcode_kv_t opcode_table[] = {
-  { "addr", 0},
-  { "addi", 1},
-  { "mulr", 2},
-  { "muli", 3},
-  { "banr", 4},
-  { "bani", 5},
-  { "borr", 6},
-  { "bori", 7},
-  { "setr", 8},
-  { "seti", 9},
-  { "gtir", 10},
-  { "gtri", 11},
-  { "gtrr", 12},
-  { "eqir", 13},
-  { "eqri", 14},
-  { "eqrr", 15}
+static const char* opcode_table[] = {
+  "addr",
+  "addi",
+  "mulr",
+  "muli",
+  "banr",
+  "bani",
+  "borr",
+  "bori",
+  "setr",
+  "seti",
+  "gtir",
+  "gtri",
+  "gtrr",
+  "eqir",
+  "eqri",
+  "eqrr"
 };
 
 // convert opname to opcode
 int op_s2i(const char* s)
 {
   FOR_(i, 16) {
-    if (strcmp(opcode_table[i].k, s) == 0)
-      return opcode_table[i].v;
+    if (strcmp(opcode_table[i], s) == 0)
+      return i;
   }
   return -1;
 }
