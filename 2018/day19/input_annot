@@ -158,37 +158,74 @@ setup:
        R5 = ((R5 + 2) * (R5 + 2)) * 209
        R2 = ((R2 + 1) * 22) + 6
        R5 = R5 + R2
-work:
+
        R2 = 27
        R2 = 28 * R2
        R2 = 29 + R2
        R2 = 30 * R2
        R2 = R2 * 14
        R2 = R2 * 32
+
        R5 = R5 + R2
        R0 = 0
        jmp foo
 
 foo:
        R1 = 1
+
 bar:
        R3 = 1
 baz:
        R2 = R1 * R3
 
        if (R2 == R5) {
-          R2 = 1
           R0 += R1
           R3++
        } else {
-          R2 = 0
           R3++
        }
+
        if (R3 > R5) {
-           R2 = 1
            R1++;
-           if (R1 > R5) HALT else jmp bar
-         } else {
-           R2 = 0
+           if (R1 > R5) {
+             HALT
+           } else {
+             jmp bar
+           }
+       } else {
+           jmp baz
+       }
+
+--------------------------------------------------------------------------------=
+## STRUCTURED PROGRAM 2
+
+#ip 4
+// R0=1, R1=0, R2=0, R3=0, R4=0, R5=0
+
+begin:
+       R5 = 10551264
+       R0 = 0
+       R1 = 1
+
+bar:
+       R3 = 1
+baz:
+       R2 = R1 * R3
+
+       if (R2 == R5) {
+          R0 += R1
+          R3++
+       } else {
+          R3++
+       }
+
+       if (R3 > R5) {
+           R1++;
+           if (R1 > R5) {
+             HALT
+           } else {
+             jmp bar
+           }
+       } else {
            jmp baz
        }
