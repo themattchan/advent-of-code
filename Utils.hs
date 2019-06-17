@@ -75,6 +75,13 @@ tally = foldl' (\m x -> M.insertWith (+) x 1 m) mempty
 {-# INLINEABLE tally #-}
 {-# SPECIALISE tally :: [Int] -> M.Map Int Int #-}
 {-# SPECIALISE tally :: [String] -> M.Map String Int #-}
+
+-- Generate all unordered pairs from a list, without self-pairs
+-- > unorderedPairs [1,2,3,4]
+-- > [(1,2),(1,3),(1,4),(2,3),(2,4),(3,4)]
+unorderedPairs :: [a] -> [(a, a)]
+unorderedPairs = foldMap (foldMap (uncurry (map . (,))) . uncons) . tails
+
 --------------------------------------------------------------------------------
 -- * Regex
 
