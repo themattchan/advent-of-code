@@ -1,48 +1,47 @@
 #! /usr/bin/env runhaskell -i../../
 {-# LANGUAGE TypeApplications #-}
+import qualified Data.Array as A
 import qualified Data.Graph as G
+import qualified Data.Map as M
+import qualified Data.Set as S
 import Utils
 import Debug.Trace
 
+type MyGraph = M.Map String (S.Set String)
 
-
---t1 :: [String] -> String
-t1 is = trace ("vs: " <> show vs) $ map (\x -> fst $ fromJust $ find ((== x) . snd) vs)
-         (myTopSort vs es' graph)
---        trace ("ggg: "<> show vs) $
---          (reverse (G.topSort (G.transposeG graph)))
+buildGraph :: [String] -> (MyGraph, MyGraph)
+buildGraph is = (fwdG, bwdG)
   where
-    graph = G.buildG (1,length vs) es'
-    es = foldMap re1 is
-    es' = [(i,j) | (x,y) <- es, let Just i = lookup x vs, let Just j = lookup y vs]
-    vs = (`zip` [1..]) $ sort $ nub $ concat [[x,y] | (x,y) <- es ]
+    fwdG = M.fromListWith (<>) fes'
+    bwdG = M.fromListWith (<>) bes'
 
-    re1 = getIt . match rgx
+    es = foldMap re1 is
+
+    fes' = [(i, S.singleton j) | (i,j) <- es]
+    bes' = [(j, S.singleton i) | (i,j) <- es]
+
+    re1 = foldMap (\f -> [(f 1, f 2)]) . match rgx
 
     rgx :: Regex
     rgx = makeRegex "^Step ([A-Z]) must be finished before step ([A-Z]) can begin\\.$"
 
-    getIt (Just (_,ss,_)) = edge $ foldMap ((:[]) . fst) ss
-    getIt Nothing = error "regex failed"
-
-    edge [_,[x],[y]] = trace ([x]<> " " <>[y]) [(y,x)] -- y depends on x
-    edge x = error ("edge: " <> show x)
-
--- g is a "depends on" graph
-
---myTopSort :: [G.Edge] -> G.Graph -> [G.Vertex]
-myTopSort vs es g = go [] (G.vertices g)
+mySort :: (MyGraph, MyGraph) -> String
+mySort (fg, bg) = trace ("|ret|="<>show (length ret)<>"  |keys|="<> show (S.size vs))
+    ret
   where
-    vOuts v = undefined
---    vOuts done v = sort [j | (i,j) <- es, i==v, j `notElem` done]
-    go out [] = out
-    go out (v:todo)
---      | trace ("DO: "<> show v <> show (lookup v (map swap vs))) False = undefined
-      | null (vOuts out v) = go (v:out) todo
-      | otherwise = let doit = (\x -> trace ("doit " <> show x) x) $ vOuts out v
-                        todo' = todo \\ doit
-                    in go out (doit ++ (v:todo'))
+    ret = go ([f], S.empty) (S.toAscList $ fg M.! f)
+
+    f = S.findMin (ks S.\\ vs)
+
+    ks = M.keysSet fg
+    vs = fold fg
+
+    go (ret, _) [] = concat $ reverse ret
+    go (ret, retS) (t:todo) = go (t:ret, retS') todo'
+      where
+        retS' = S.insert t retS
+        new = S.filter (\n -> fold (M.lookup n bg) `S.isSubsetOf` retS') (fold $ M.lookup t fg)
+        todo' = S.toAscList (new <> S.fromList todo)
 
 
-
-main = putStrLn . t1 . lines =<< readFile "test"
+main = print . mySort . buildGraph . lines =<< readFile "input"
