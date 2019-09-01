@@ -12,13 +12,10 @@ type MyGraph = M.Map String (S.Set String)
 buildGraph :: [String] -> (MyGraph, MyGraph)
 buildGraph is = (fwdG, bwdG)
   where
-    fwdG = M.fromListWith (<>) fes'
-    bwdG = M.fromListWith (<>) bes'
+    fwdG = M.fromListWith (<>) [(i, S.singleton j) | (i,j) <- es]
+    bwdG = M.fromListWith (<>) [(j, S.singleton i) | (i,j) <- es]
 
     es = foldMap re1 is
-
-    fes' = [(i, S.singleton j) | (i,j) <- es]
-    bes' = [(j, S.singleton i) | (i,j) <- es]
 
     re1 = foldMap (\f -> [(f 1, f 2)]) . match rgx
 
@@ -26,22 +23,58 @@ buildGraph is = (fwdG, bwdG)
     rgx = makeRegex "^Step ([A-Z]) must be finished before step ([A-Z]) can begin\\.$"
 
 mySort :: (MyGraph, MyGraph) -> String
-mySort (fg, bg) = trace ("|ret|="<>show (length ret)<>"  |keys|="<> show (S.size vs))
+mySort (fg, bg) =
+  trace ("\n|ret|="<>show (S.size $ S.fromList ret)
+          <> "  |vs|="<> show (S.size vs)
+          <> "  |ks|="<>show (S.size ks)
+          <> "  |allNodes|="<>show(S.size allNodes)
+          <> "\nkeys="<>show (fold$S.toAscList ks)
+          <> "\nret="<> sort ret
+          <> "\ndiff=" <> show (allNodes S.\\ S.fromList (map (:[])ret))
+          <> "\nf="<>show f
+          <> "\nnoDups="<> show(S.size (S.fromList ret) == length ret)
+        )
     ret
   where
-    ret = go ([f], S.empty) (S.toAscList $ fg M.! f)
+    ret = go [f] (S.singleton f) S.empty (S.toAscList $ fg M.! f)
 
     f = S.findMin (ks S.\\ vs)
 
+    allNodes = ks<>vs
     ks = M.keysSet fg
     vs = fold fg
 
-    go (ret, _) [] = concat $ reverse ret
-    go (ret, retS) (t:todo) = go (t:ret, retS') todo'
+    splitPending seen pending =
+      -- returns (still pending, avail)
+      S.partition (\n -> fold (M.lookup n bg) `S.intersection` pending /= S.empty)
+      $ S.filter (\n -> n `S.notMember` seen)
+      $ pending
+
+    go ret retS pending []
+      | S.null pending = concat $ (reverse ret) <> S.toAscList (allNodes S.\\ retS)
+      | otherwise =
+        let (pending', todo) = --traceShowId  $
+              splitPending retS pending
+        in -- trace (" retS = "<> show retS) $
+          go ret retS pending' (S.toAscList todo)
+
+    go ret retS pending (t:todo) =
+      trace (
+      "\ngo: visit "<> t
+      --  <> " retS'="<> show retS'
+        <> " \npending="<>show pending
+        <>"\npending'="<>show pending'
+        <> "   new="<>show new
+        <> "\ntodo="<>show todo
+        <> "   todo'=" <>show todo'
+      ) $
+        go (t:ret) retS' pending' todo'
       where
         retS' = S.insert t retS
-        new = S.filter (\n -> fold (M.lookup n bg) `S.isSubsetOf` retS') (fold $ M.lookup t fg)
+
+        (pending', new) = splitPending retS' (pending <> (fold $ M.lookup t fg))
+
         todo' = S.toAscList (new <> S.fromList todo)
 
-
+main :: IO ()
 main = print . mySort . buildGraph . lines =<< readFile "input"
